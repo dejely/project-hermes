@@ -1,0 +1,44 @@
+name: CI
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+          cache: 'pnpm'
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase
+        run: supabase db start
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Verify generated types are committed
+        run: |
+          mkdir -p types
+          supabase gen types typescript --local > types/supabase.ts
+          if ! git diff --exit-code types/supabase.ts; then
+            echo "Error: Database types are out of sync"
+            echo "Run: supabase gen types typescript --local > types/supabase.ts"
+            exit 1
+          fi
+
+      - name: Run CI checks
+        run: pnpm run ci
