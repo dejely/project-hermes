@@ -153,34 +153,34 @@ CREATE POLICY "Responders can update incidents"
 ON public.incidents
 FOR UPDATE
 TO authenticated
-USING ((SELECT auth.role()) = 'authenticated')
-WITH CHECK ((SELECT auth.role()) = 'authenticated');
+USING (true)
+WITH CHECK (true);
 
 -- Advisories Policies
 CREATE POLICY "Responders can read advisories"
 ON public.advisories
 FOR SELECT
 TO authenticated
-USING ((SELECT auth.role()) = 'authenticated');
+USING (true);
 
 CREATE POLICY "Responders can insert advisories"
 ON public.advisories
 FOR INSERT
 TO authenticated
-WITH CHECK ((SELECT auth.role()) = 'authenticated');
+WITH CHECK (true);
 
 CREATE POLICY "Responders can update advisories"
 ON public.advisories
 FOR UPDATE
 TO authenticated
-USING ((SELECT auth.role()) = 'authenticated')
-WITH CHECK ((SELECT auth.role()) = 'authenticated');
+USING (true)
+WITH CHECK (true);
 
 CREATE POLICY "Responders can delete advisories"
 ON public.advisories
 FOR DELETE
 TO authenticated
-USING ((SELECT auth.role()) = 'authenticated');
+USING (true);
 
 -- Advisory Recipients Policies
 CREATE POLICY "Backend can insert advisory recipients"
@@ -193,7 +193,7 @@ CREATE POLICY "Responders can read advisory recipients"
 ON public.advisory_recipients
 FOR SELECT
 TO authenticated
-USING ((SELECT auth.role()) = 'authenticated');
+USING (true);
 
 CREATE POLICY "Backend can update advisory recipients"
 ON public.advisory_recipients
