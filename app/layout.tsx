@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { ThemeProvider } from 'next-themes';
-import { Geist } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import './globals.css';
 
 const defaultUrl = process.env.VERCEL_URL
@@ -13,11 +13,7 @@ export const metadata: Metadata = {
   description: 'DRRM communication control center',
 };
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  display: 'swap',
-  subsets: ['latin'],
-});
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export default function RootLayout({
   children,
@@ -26,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
+      <body className={`${inter.className} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
