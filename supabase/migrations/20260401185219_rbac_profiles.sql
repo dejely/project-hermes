@@ -2,10 +2,8 @@ create schema if not exists private;
 
 create type public.app_role as enum (
   'super_admin',
-  'ops_admin',
-  'dispatcher',
-  'responder',
-  'civilian'
+  'admin',
+  'responder'
 );
 
 create table public.profiles (

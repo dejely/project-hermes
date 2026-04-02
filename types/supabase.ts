@@ -172,6 +172,27 @@ export type Database = {
           },
         ];
       };
+      profiles: {
+        Row: {
+          created_at: string;
+          full_name: string | null;
+          id: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          full_name?: string | null;
+          id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          full_name?: string | null;
+          id?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       residents: {
         Row: {
           created_at: string;
@@ -205,14 +226,67 @@ export type Database = {
         };
         Relationships: [];
       };
+      role_assignments: {
+        Row: {
+          created_at: string;
+          id: number;
+          role: Database['public']['Enums']['app_role'];
+          scope_id: string | null;
+          scope_type: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: never;
+          role: Database['public']['Enums']['app_role'];
+          scope_id?: string | null;
+          scope_type?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: never;
+          role?: Database['public']['Enums']['app_role'];
+          scope_id?: string | null;
+          scope_type?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'role_assignments_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      has_any_role: {
+        Args: {
+          target_roles: Database['public']['Enums']['app_role'][];
+          target_scope_id?: string;
+          target_scope_type?: string;
+        };
+        Returns: boolean;
+      };
+      has_role: {
+        Args: {
+          target_role: Database['public']['Enums']['app_role'];
+          target_scope_id?: string;
+          target_scope_type?: string;
+        };
+        Returns: boolean;
+      };
+      is_admin_or_above: { Args: never; Returns: boolean };
+      is_responder_or_above: { Args: never; Returns: boolean };
     };
     Enums: {
+      app_role: 'super_admin' | 'admin' | 'responder';
       incident_severity: 'low' | 'moderate' | 'high' | 'critical';
       incident_status:
         | 'new'
@@ -355,6 +429,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      app_role: ['super_admin', 'admin', 'responder'],
       incident_severity: ['low', 'moderate', 'high', 'critical'],
       incident_status: [
         'new',

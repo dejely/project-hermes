@@ -50,14 +50,13 @@ as $$
   select public.has_any_role(
     array[
       'super_admin',
-      'ops_admin',
-      'dispatcher',
+      'admin',
       'responder'
     ]::public.app_role[]
   );
 $$;
 
-create or replace function public.is_ops_admin_or_above()
+create or replace function public.is_admin_or_above()
 returns boolean
 language sql
 stable
@@ -67,7 +66,7 @@ as $$
   select public.has_any_role(
     array[
       'super_admin',
-      'ops_admin'
+      'admin'
     ]::public.app_role[]
   );
 $$;
@@ -94,12 +93,12 @@ for select
 to authenticated
 using (public.is_responder_or_above());
 
-create policy "Ops admins can manage incident types"
+create policy "Admins can manage incident types"
 on public.incident_types
 for all
 to authenticated
-using (public.is_ops_admin_or_above())
-with check (public.is_ops_admin_or_above());
+using (public.is_admin_or_above())
+with check (public.is_admin_or_above());
 
 create policy "Staff can read incidents"
 on public.incidents
@@ -148,17 +147,17 @@ for select
 to authenticated
 using (public.is_responder_or_above());
 
-create policy "Ops admins can read profiles"
+create policy "Admins can read profiles"
 on public.profiles
 for select
 to authenticated
-using (public.is_ops_admin_or_above());
+using (public.is_admin_or_above());
 
-create policy "Ops admins can read role assignments"
+create policy "Admins can read role assignments"
 on public.role_assignments
 for select
 to authenticated
-using (public.is_ops_admin_or_above());
+using (public.is_admin_or_above());
 
 create policy "Super admins can insert role assignments"
 on public.role_assignments
