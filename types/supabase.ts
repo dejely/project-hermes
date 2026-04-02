@@ -34,6 +34,51 @@ export type Database = {
   };
   public: {
     Tables: {
+      account_invites: {
+        Row: {
+          accepted_at: string | null;
+          accepted_user_id: string | null;
+          claim_expires_at: string | null;
+          created_at: string;
+          email: string;
+          expires_at: string | null;
+          id: string;
+          invited_by: string;
+          revoked_at: string | null;
+          role: Database['public']['Enums']['app_role'];
+          token_hash: string;
+          updated_at: string;
+        };
+        Insert: {
+          accepted_at?: string | null;
+          accepted_user_id?: string | null;
+          claim_expires_at?: string | null;
+          created_at?: string;
+          email: string;
+          expires_at?: string | null;
+          id?: string;
+          invited_by: string;
+          revoked_at?: string | null;
+          role: Database['public']['Enums']['app_role'];
+          token_hash: string;
+          updated_at?: string;
+        };
+        Update: {
+          accepted_at?: string | null;
+          accepted_user_id?: string | null;
+          claim_expires_at?: string | null;
+          created_at?: string;
+          email?: string;
+          expires_at?: string | null;
+          id?: string;
+          invited_by?: string;
+          revoked_at?: string | null;
+          role?: Database['public']['Enums']['app_role'];
+          token_hash?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       advisories: {
         Row: {
           created_at: string;
@@ -266,6 +311,28 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      bootstrap_registration_open: { Args: never; Returns: boolean };
+      claim_account_invite: {
+        Args: { target_token_hash: string };
+        Returns: {
+          email: string;
+          expires_at: string;
+          id: string;
+          role: Database['public']['Enums']['app_role'];
+        }[];
+      };
+      claim_bootstrap_admin: {
+        Args: { target_email: string };
+        Returns: boolean;
+      };
+      complete_account_invite: {
+        Args: { target_token_hash: string; target_user_id: string };
+        Returns: {
+          email: string;
+          id: string;
+          role: Database['public']['Enums']['app_role'];
+        }[];
+      };
       has_any_role: {
         Args: {
           target_roles: Database['public']['Enums']['app_role'][];
@@ -284,6 +351,14 @@ export type Database = {
       };
       is_admin_or_above: { Args: never; Returns: boolean };
       is_responder_or_above: { Args: never; Returns: boolean };
+      release_account_invite_claim: {
+        Args: { target_token_hash: string };
+        Returns: undefined;
+      };
+      release_bootstrap_admin_claim: {
+        Args: { target_email: string };
+        Returns: undefined;
+      };
     };
     Enums: {
       app_role: 'super_admin' | 'admin' | 'responder';

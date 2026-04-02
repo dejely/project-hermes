@@ -7,13 +7,13 @@ import { redirect, unstable_rethrow } from 'next/navigation';
 import { z } from 'zod';
 
 import { requireRole, userHasRole } from './dal';
+import type { AppRole, AuthActionState } from './types';
 import {
   createInviteToken,
   getSiteUrl,
   hashInviteToken,
   normalizeEmail,
 } from './utils';
-import type { AppRole, AuthActionState } from './types';
 
 const passwordSchema = z
   .string()
