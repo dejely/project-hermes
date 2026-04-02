@@ -1,4 +1,4 @@
-export default function Wordmark({ size = 124, className = '' }) {
+export default function Wordmark({ size = 124, className = '', ...props }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -6,6 +6,7 @@ export default function Wordmark({ size = 124, className = '' }) {
       width={size}
       className={`w-full h-auto ${className}`}
       fill="currentColor"
+      {...props}
     >
       <polygon points="0 492.82 104.62 492.82 104.62 285.57 104.62 203 104.62 6.53 0 6.53 0 492.82" />
       <polygon points="327.23 203 144.62 203 154.62 285.57 327.23 285.57 327.23 492.82 432.19 492.82 432.19 6.53 327.23 6.53 327.23 203" />
