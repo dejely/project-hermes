@@ -30,11 +30,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Verify generated types are committed
+      - name: Generate Supabase types
         run: |
           mkdir -p types
           supabase gen types typescript --local > types/supabase.ts
-          if ! git diff --exit-code types/supabase.ts; then
+
+      - name: Format generated types
+        run: pnpm exec prettier --write types/supabase.ts
+
+      - name: Verify generated types are committed
+        run: |
+          if ! git diff  --ignore-space-at-eol --exit-code types/supabase.ts; then
             echo "Error: Database types are out of sync"
             echo "Run: supabase gen types typescript --local > types/supabase.ts"
             exit 1
