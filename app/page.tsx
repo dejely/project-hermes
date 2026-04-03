@@ -1,10 +1,4 @@
-import { AuthButton } from '@/components/auth-button';
-import Logo from '@/components/brand/logo';
-import Wordmark from '@/components/brand/wordmark';
-import WordmarkLogo from '@/components/brand/wordmark-logo';
-import { ThemeSwitcher } from '@/components/theme-switcher';
-import Link from 'next/link';
-import { Suspense } from 'react';
+import LandingPage from '@/components/landing-page';
 
 export default function Home() {
   return (
