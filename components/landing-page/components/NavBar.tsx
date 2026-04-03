@@ -87,7 +87,7 @@ export function Navbar({ authButton }: { authButton?: ReactNode }) {
         </NavigationMenu>
 
         {/* Desktop CTA */}
-        <div className="flex gap-4 items-center">
+        <div className="hidden xl:flex items-center gap-4 text-sm">
           {/* Control Center */}
           <Link href="/control-center">Control Center</Link>
 
@@ -98,7 +98,7 @@ export function Navbar({ authButton }: { authButton?: ReactNode }) {
             variant="ghost"
             size="icon"
             asChild
-            className="cursor-pointer"
+            className="cursor-pointer mr-[-15px] ml-[-12px]"
           >
             <a
               href="https://github.com/silicondeck/shadcn-dashboard-landing-template"
@@ -199,26 +199,30 @@ export function Navbar({ authButton }: { authButton?: ReactNode }) {
 
               {/* Footer Actions */}
               <div className="border-t p-6 space-y-4">
-                <div className="space-y-3">
-                  {/* Control Center */}
-                  <Link
-                    href="/control-center"
-                    className="px-4 py-3 text-base font-medium"
+                <div className="flex flex-col gap-3">
+                  {' '}
+                  {/* Changed to flex-col for better control */}
+                  {/* Control Center - Now full width to match the grid below */}
+                  <Button
+                    variant="ghost"
+                    size="lg"
+                    asChild
+                    className="w-full justify-center text-base font-medium cursor-pointer"
                   >
-                    Control Center
-                  </Link>
-
+                    <Link href="/control-center">Control Center</Link>
+                  </Button>
                   {/* Sign In + Create Admin */}
                   <div className="grid grid-cols-2 gap-3">
                     <Button
                       variant="outline"
                       size="lg"
                       asChild
-                      className="cursor-pointer"
+                      className="cursor-pointer w-full"
                     >
                       <Link href="/auth/sign-in">Sign In</Link>
                     </Button>
-                    <Button asChild size="lg" className="cursor-pointer">
+
+                    <Button size="lg" asChild className="cursor-pointer w-full">
                       <Link href="/auth/sign-up">Create Admin</Link>
                     </Button>
                   </div>
