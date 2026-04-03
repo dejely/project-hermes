@@ -1,10 +1,10 @@
-import { AuthButton } from '@/components/auth-button';
+import Link from 'next/link';
+import { Suspense } from 'react';
 import Logo from '@/components/brand/logo';
 import Wordmark from '@/components/brand/wordmark';
 import WordmarkLogo from '@/components/brand/wordmark-logo';
+import { AuthButton } from '@/components/auth-button';
 import { ThemeSwitcher } from '@/components/theme-switcher';
-import Link from 'next/link';
-import { Suspense } from 'react';
 
 export default function Home() {
   return (
