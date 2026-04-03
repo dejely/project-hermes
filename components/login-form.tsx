@@ -18,8 +18,13 @@ import { useState } from 'react';
 
 export function LoginForm({
   className,
+  notice,
+  showBootstrapLink = false,
   ...props
-}: React.ComponentPropsWithoutRef<'div'>) {
+}: React.ComponentPropsWithoutRef<'div'> & {
+  notice?: string | null;
+  showBootstrapLink?: boolean;
+}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -59,6 +64,9 @@ export function LoginForm({
         <CardContent>
           <form onSubmit={handleLogin}>
             <div className="flex flex-col gap-6">
+              {notice ? (
+                <p className="text-sm text-emerald-600">{notice}</p>
+              ) : null}
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -94,13 +102,19 @@ export function LoginForm({
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{' '}
-              <Link
-                href="/auth/sign-up"
-                className="underline underline-offset-4"
-              >
-                Sign up
-              </Link>
+              {showBootstrapLink ? (
+                <>
+                  Need the initial admin account?{' '}
+                  <Link
+                    href="/auth/sign-up"
+                    className="underline underline-offset-4"
+                  >
+                    Create it here
+                  </Link>
+                </>
+              ) : (
+                'Need access? Ask an admin to send you an invite.'
+              )}
             </div>
           </form>
         </CardContent>
