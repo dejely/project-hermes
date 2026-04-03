@@ -1,6 +1,6 @@
 import { AuthButton } from '@/components/auth-button';
-import Header from '@/components/header';
 import { Suspense } from 'react';
+import { NewHeroSection as HeroSection } from './components/HeroSection';
 import { Navbar } from './components/NavBar';
 
 export default function LandingPage() {
@@ -14,10 +14,7 @@ export default function LandingPage() {
             </Suspense>
           }
         />
-        <Header />
-        <div className="items-center text-center">
-          <h1 className="text-4xl font-bold">This is a landing page</h1>
-        </div>
+        <HeroSection />
       </div>
     </main>
   );
