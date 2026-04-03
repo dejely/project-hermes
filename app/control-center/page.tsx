@@ -1,16 +1,11 @@
 import { ChartAreaInteractive } from '@/components/control-center/chart-area-interactive';
-import { DataTable } from '@/components/control-center/data-table';
 import { SectionCards } from '@/components/control-center/section-cards';
-import data from './data.json';
 
 export default async function Page() {
   return (
-    <div className="@container/main flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
+    <div className="@container/main flex flex-1 flex-col gap-4 px-4 py-4 md:gap-6 md:py-6 lg:px-6">
       <SectionCards />
-      <div className="px-4 lg:px-6">
-        <ChartAreaInteractive />
-      </div>
-      <DataTable data={data} />
+      <ChartAreaInteractive />
     </div>
   );
 }
