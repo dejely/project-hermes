@@ -5,7 +5,7 @@ import { useTypewriter } from '@/hooks/use-typewriter';
 import { ArrowRight, Play } from 'lucide-react';
 import { useState } from 'react';
 
-import demoThumbnail from '@/components/brand/image.png';
+import demoThumbnail from '@/components/assets/image.png';
 
 const INCIDENT_TYPES = [
   'Fire',
