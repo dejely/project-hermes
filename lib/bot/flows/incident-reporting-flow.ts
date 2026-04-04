@@ -1,6 +1,4 @@
 import type { BotThread } from '@/lib/bot/types';
-import { pointToString } from '@/lib/geo';
-import { createAdminClient } from '@/lib/supabase/admin';
 import type { Point } from '@/types/geo';
 import { Constants, type Enums } from '@/types/supabase';
 import type { SelectionOption, Step } from '../steps/step-types';
@@ -12,6 +10,10 @@ import {
   required,
 } from '../steps/validators';
 import type { Flow } from './flow-types';
+import {
+  fetchIncidentTypeNames,
+  submitIncidentReport,
+} from './incident-reporting-service';
 
 type IncidentSeverity = Enums<'incident_severity'>;
 
@@ -34,25 +36,14 @@ function getSelectionStepById(flow: Flow, stepId: string): Step {
 }
 
 async function hydrateIncidentReportingFlowOptions(): Promise<void> {
-  const supabase = createAdminClient();
+  const incidentTypeNames = await fetchIncidentTypeNames();
 
-  const { data, error } = await supabase
-    .from('incident_types')
-    .select('name')
-    .order('name', { ascending: true });
-
-  if (error) {
-    console.error('Failed to load incident types:', error);
-    throw new Error(
-      'Incident types are currently unavailable. Please try again.'
-    );
-  }
-
-  const incidentTypeOptions: SelectionOption[] =
-    data?.map((incidentType) => ({
-      label: incidentType.name,
-      value: incidentType.name,
-    })) ?? [];
+  const incidentTypeOptions: SelectionOption[] = incidentTypeNames.map(
+    (incidentTypeName) => ({
+      label: incidentTypeName,
+      value: incidentTypeName,
+    })
+  );
 
   if (incidentTypeOptions.length === 0) {
     throw new Error(
@@ -181,59 +172,13 @@ export const incidentReportingFlow: Flow = {
         coordinates: [lng, lat],
       };
 
-      const supabase = createAdminClient();
-
-      const { data: resident, error: residentError } = await supabase
-        .from('residents')
-        .select('id')
-        .eq('thread_id', thread.id)
-        .maybeSingle();
-
-      if (residentError) {
-        console.error(
-          'Failed to resolve resident for incident report:',
-          residentError
-        );
-        throw new Error('Failed to identify your account. Please try again.');
-      }
-
-      if (!resident) {
-        throw new Error(
-          'You need to complete onboarding before reporting incidents.'
-        );
-      }
-
-      const { data: incidentType, error: incidentTypeError } = await supabase
-        .from('incident_types')
-        .select('id')
-        .eq('name', incidentTypeName)
-        .maybeSingle();
-
-      if (incidentTypeError) {
-        console.error('Failed to resolve incident type:', incidentTypeError);
-        throw new Error('Failed to process incident type. Please try again.');
-      }
-
-      if (!incidentType) {
-        throw new Error(
-          'Selected incident type is no longer available. Please try again.'
-        );
-      }
-
-      const { error: insertError } = await supabase.from('incidents').insert({
-        reported_by: resident.id,
-        incident_type_id: incidentType.id,
+      await submitIncidentReport({
+        thread,
+        incidentTypeName,
         severity: severity as IncidentSeverity,
         description,
-        location: pointToString(normalizedLocation),
+        location: normalizedLocation,
       });
-
-      if (insertError) {
-        console.error('Failed to insert incident report:', insertError);
-        throw new Error(
-          'Failed to submit your report. Please try again later.'
-        );
-      }
 
       const { renderCard } = await import('../renderers/card-renderer');
       await renderCard(thread, {

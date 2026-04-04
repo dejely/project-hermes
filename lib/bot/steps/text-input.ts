@@ -40,7 +40,7 @@ export class TextInputHandler extends BaseStepHandler {
 
     await renderCard(thread, {
       title: prompt,
-      content: `Please provide ${step.id}`,
+      content: 'Please send your response.',
     });
   }
 }
