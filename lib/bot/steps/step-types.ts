@@ -85,7 +85,13 @@ export interface StepHandler {
    * @param data Current step or message data
    * @param step Step definition for context
    */
-  parse(data: unknown, step: Step): { value: unknown } | { error: string };
+  parse(
+    data: unknown,
+    step: Step
+  ):
+    | { value: unknown }
+    | { error: string }
+    | Promise<{ value: unknown } | { error: string }>;
 
   /**
    * Render the step's prompt/UI.

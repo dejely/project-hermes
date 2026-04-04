@@ -99,7 +99,7 @@ class FlowEngine {
     const handler = stepHandlerRegistry.get(currentStep.type);
 
     // Parse input
-    const parseResult = handler.parse(input, currentStep);
+    const parseResult = await handler.parse(input, currentStep);
 
     if ('error' in parseResult) {
       // Validation failed - stay on same step

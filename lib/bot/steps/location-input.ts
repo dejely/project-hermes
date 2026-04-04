@@ -1,4 +1,5 @@
 import type { BotThread } from '@/lib/bot/types';
+import { createDefaultGeocodingService } from '@/lib/geocoding';
 import type { Point } from '@/types/geo';
 import { BaseStepHandler } from './base-step';
 import type { Step } from './step-types';
@@ -6,6 +7,8 @@ import type { Step } from './step-types';
 const renderCardPromise = import('../renderers/card-renderer').then(
   (module) => module.renderCard
 );
+
+const geocodingService = createDefaultGeocodingService();
 
 /**
  * Handler for location input steps.
@@ -15,28 +18,86 @@ const renderCardPromise = import('../renderers/card-renderer').then(
 export class LocationInputHandler extends BaseStepHandler {
   type = 'location' as const;
 
-  parse(data: unknown, step: Step): { value: unknown } | { error: string } {
+  async parse(
+    data: unknown,
+    step: Step
+  ): Promise<{ value: unknown } | { error: string }> {
     // Try to extract location from message payload or raw event payload.
-    const location = this.extractLocation(data);
+    const location = this.extractPresetLocation(data);
 
-    if (!location) {
-      return { error: 'Could not extract location from message' };
+    if (location) {
+      const validationError = this.validateValue(location, step);
+      if (validationError) {
+        return { error: validationError };
+      }
+
+      return { value: location };
     }
 
-    // Validate as GeoJSON Point
-    const validationError = this.validateValue(location, step);
-    if (validationError) {
-      return { error: validationError };
+    const textInput = this.extractTextInput(data);
+    if (!textInput) {
+      return {
+        error:
+          'I do not know where is that. Please send your location pin or a recognizable place/address.',
+      };
     }
 
-    return { value: location };
+    try {
+      const geocodingResults = await geocodingService.forwardGeocode(
+        textInput,
+        {
+          limit: 1,
+        }
+      );
+
+      const geocodedLocation = geocodingResults[0]?.point;
+
+      if (!geocodedLocation) {
+        return {
+          error:
+            'I do not know where is that. Please send a more specific place/address or share your location pin.',
+        };
+      }
+
+      const validationError = this.validateValue(geocodedLocation, step);
+      if (validationError) {
+        return { error: validationError };
+      }
+
+      return { value: geocodedLocation };
+    } catch (error) {
+      console.error('Location geocoding error:', error);
+      return {
+        error:
+          'Unable to process the location right now. Please try again or share your location pin.',
+      };
+    }
+  }
+
+  private extractTextInput(payload: unknown): string | undefined {
+    if (typeof payload === 'string') {
+      const trimmed = payload.trim();
+      return trimmed.length > 0 ? trimmed : undefined;
+    }
+
+    if (!payload || typeof payload !== 'object') {
+      return undefined;
+    }
+
+    const text = (payload as { text?: unknown }).text;
+    if (typeof text !== 'string') {
+      return undefined;
+    }
+
+    const trimmed = text.trim();
+    return trimmed.length > 0 ? trimmed : undefined;
   }
 
   /**
    * Extract location from message payload.
    * Supports current Chat message shape and Telegram raw payload variants.
    */
-  private extractLocation(payload: unknown): Point | undefined {
+  private extractPresetLocation(payload: unknown): Point | undefined {
     if (!payload || typeof payload !== 'object') {
       return undefined;
     }
