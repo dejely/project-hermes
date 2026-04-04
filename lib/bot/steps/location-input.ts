@@ -10,6 +10,10 @@ const renderCardPromise = import('../renderers/card-renderer').then(
 
 const geocodingService = createDefaultGeocodingService();
 
+type ResolvedLocation = Point & {
+  locationDescription?: string;
+};
+
 /**
  * Handler for location input steps.
  * Extracts location from raw message data (platform-specific).
@@ -26,6 +30,36 @@ export class LocationInputHandler extends BaseStepHandler {
     const location = this.extractPresetLocation(data);
 
     if (location) {
+      if (step.resolveLocationDescription) {
+        try {
+          const reverseResult = await geocodingService.reverseGeocode(location);
+          if (!reverseResult?.displayName) {
+            return {
+              error:
+                'Unable to resolve location name from that pin. Please try again or send a nearby place/address.',
+            };
+          }
+
+          const resolvedLocation: ResolvedLocation = {
+            ...location,
+            locationDescription: reverseResult.displayName,
+          };
+
+          const validationError = this.validateValue(resolvedLocation, step);
+          if (validationError) {
+            return { error: validationError };
+          }
+
+          return { value: resolvedLocation };
+        } catch (error) {
+          console.error('Reverse geocoding error:', error);
+          return {
+            error:
+              'Unable to process that pin right now. Please try again or send a place/address.',
+          };
+        }
+      }
+
       const validationError = this.validateValue(location, step);
       if (validationError) {
         return { error: validationError };
@@ -50,7 +84,8 @@ export class LocationInputHandler extends BaseStepHandler {
         }
       );
 
-      const geocodedLocation = geocodingResults[0]?.point;
+      const bestMatch = geocodingResults[0];
+      const geocodedLocation = bestMatch?.point;
 
       if (!geocodedLocation) {
         return {
@@ -59,12 +94,29 @@ export class LocationInputHandler extends BaseStepHandler {
         };
       }
 
-      const validationError = this.validateValue(geocodedLocation, step);
+      const resolvedLocation: ResolvedLocation = {
+        ...geocodedLocation,
+        ...(step.resolveLocationDescription && bestMatch?.displayName
+          ? { locationDescription: bestMatch.displayName }
+          : {}),
+      };
+
+      if (
+        step.resolveLocationDescription &&
+        !resolvedLocation.locationDescription
+      ) {
+        return {
+          error:
+            'I could not resolve the location name. Please send a more specific place/address or share your location pin.',
+        };
+      }
+
+      const validationError = this.validateValue(resolvedLocation, step);
       if (validationError) {
         return { error: validationError };
       }
 
-      return { value: geocodedLocation };
+      return { value: resolvedLocation };
     } catch (error) {
       console.error('Location geocoding error:', error);
       return {

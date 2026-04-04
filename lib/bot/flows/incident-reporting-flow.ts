@@ -109,6 +109,7 @@ export const incidentReportingFlow: Flow = {
       prompt: 'Please share the location of the incident.',
       validations: [isGeometryPoint],
       dataKey: 'location',
+      resolveLocationDescription: true,
     },
     {
       id: 'review_submission',
@@ -127,16 +128,22 @@ export const incidentReportingFlow: Flow = {
             : 'Not provided';
 
         const locationPoint = data.location as
-          | { type?: unknown; coordinates?: unknown }
+          | {
+              type?: unknown;
+              coordinates?: unknown;
+              locationDescription?: unknown;
+            }
           | undefined;
 
         const locationSummary =
-          locationPoint?.type === 'Point' &&
-          Array.isArray(locationPoint.coordinates) &&
-          typeof locationPoint.coordinates[0] === 'number' &&
-          typeof locationPoint.coordinates[1] === 'number'
-            ? `${locationPoint.coordinates[1]}, ${locationPoint.coordinates[0]}`
-            : 'Not provided';
+          typeof locationPoint?.locationDescription === 'string'
+            ? locationPoint.locationDescription
+            : locationPoint?.type === 'Point' &&
+                Array.isArray(locationPoint.coordinates) &&
+                typeof locationPoint.coordinates[0] === 'number' &&
+                typeof locationPoint.coordinates[1] === 'number'
+              ? `${locationPoint.coordinates[1]}, ${locationPoint.coordinates[0]}`
+              : 'Not provided';
 
         return [
           `Incident Type: ${incidentType}`,
@@ -207,7 +214,11 @@ export const incidentReportingFlow: Flow = {
         throw new Error('Invalid location format.');
       }
 
-      const point = location as { type?: unknown; coordinates?: unknown };
+      const point = location as {
+        type?: unknown;
+        coordinates?: unknown;
+        locationDescription?: unknown;
+      };
       if (point.type !== 'Point' || !Array.isArray(point.coordinates)) {
         throw new Error('Invalid location format.');
       }
@@ -222,12 +233,18 @@ export const incidentReportingFlow: Flow = {
         coordinates: [lng, lat],
       };
 
+      const locationDescription =
+        typeof point.locationDescription === 'string'
+          ? point.locationDescription
+          : undefined;
+
       await submitIncidentReport({
         thread,
         incidentTypeName,
         severity: severity as IncidentSeverity,
         description,
         location: normalizedLocation,
+        locationDescription,
       });
 
       const { renderCard } = await import('../renderers/card-renderer');

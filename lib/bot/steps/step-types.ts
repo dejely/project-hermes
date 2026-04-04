@@ -40,6 +40,9 @@ export interface Step {
   /** Allow image attachments to satisfy a text step, enabling multimodal input. */
   allowImageAttachments?: boolean;
 
+  /** Resolve and attach a human-readable location description for location inputs. */
+  resolveLocationDescription?: boolean;
+
   /** Build prompt from collected flow data at render time */
   renderPrompt?: (data: FlowData) => string | undefined;
 
