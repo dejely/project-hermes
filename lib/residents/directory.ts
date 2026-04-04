@@ -13,44 +13,44 @@ function compareResidents(
   left: ResidentDirectoryRow,
   right: ResidentDirectoryRow
 ) {
-  const nameComparison = left.name.localeCompare(right.name, 'en', {
-    sensitivity: 'base',
-  });
+  const leftName = left.name?.trim() ?? '';
+  const rightName = right.name?.trim() ?? '';
 
-  if (nameComparison !== 0) {
-    return nameComparison;
+  if (leftName && rightName) {
+    const nameComparison = leftName.localeCompare(rightName, 'en', {
+      sensitivity: 'base',
+    });
+
+    if (nameComparison !== 0) {
+      return nameComparison;
+    }
+  } else if (leftName && !rightName) {
+    return -1;
+  } else if (!leftName && rightName) {
+    return 1;
   }
 
-  return (
-    new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
-  );
+  const leftCreatedAt = left.createdAt ? Date.parse(left.createdAt) : 0;
+  const rightCreatedAt = right.createdAt ? Date.parse(right.createdAt) : 0;
+
+  return rightCreatedAt - leftCreatedAt;
 }
 
 function normalizeResident(row: ResidentRow): ResidentDirectoryRow | null {
-  if (
-    !row.id ||
-    !row.name ||
-    !row.platform ||
-    !row.platform_user_id ||
-    !row.thread_id ||
-    !row.language ||
-    !row.created_at ||
-    typeof row.longitude !== 'number' ||
-    typeof row.latitude !== 'number'
-  ) {
+  if (!row.id) {
     return null;
   }
 
   return {
     id: row.id,
-    name: row.name,
-    platform: row.platform,
-    platformUserId: row.platform_user_id,
-    threadId: row.thread_id,
-    language: row.language,
-    createdAt: row.created_at,
-    longitude: row.longitude,
-    latitude: row.latitude,
+    name: row.name ?? null,
+    platform: row.platform ?? null,
+    platformUserId: row.platform_user_id ?? null,
+    threadId: row.thread_id ?? null,
+    language: row.language ?? null,
+    createdAt: row.created_at ?? null,
+    longitude: row.longitude ?? null,
+    latitude: row.latitude ?? null,
   };
 }
 

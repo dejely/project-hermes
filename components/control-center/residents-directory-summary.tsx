@@ -38,13 +38,19 @@ export function ResidentsDirectorySummary({
   messengerCount,
   filipinoCount,
   englishCount,
+  unknownLanguageCount,
 }: ResidentDirectoryStats) {
+  const languageSplit =
+    unknownLanguageCount > 0
+      ? `${filipinoCount} FIL / ${englishCount} ENG / ${unknownLanguageCount} Unknown`
+      : `${filipinoCount} FIL / ${englishCount} ENG`;
+
   return (
     <div className="grid grid-cols-1 gap-4 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       <SummaryCard
         label="Total residents"
         value={totalResidents.toString()}
-        description="All onboarded resident profiles in the control center."
+        description="All onboarded resident profiles in the control center, including incomplete records."
       />
       <SummaryCard
         label="Telegram"
@@ -58,7 +64,7 @@ export function ResidentsDirectorySummary({
       />
       <SummaryCard
         label="Language split"
-        value={`${filipinoCount} FIL / ${englishCount} ENG`}
+        value={languageSplit}
         description="Preferred response language captured during onboarding."
       />
     </div>

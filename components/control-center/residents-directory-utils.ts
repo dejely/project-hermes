@@ -5,11 +5,11 @@ import type {
   ResidentPlatform,
 } from '@/lib/residents/types';
 
-export const INITIAL_FILTERS = {
+export const INITIAL_FILTERS: ResidentDirectoryFilters = {
   query: '',
   platform: 'all',
   language: 'all',
-} satisfies ResidentDirectoryFilters;
+};
 
 export type ResidentDirectoryStats = {
   totalResidents: number;
@@ -17,29 +17,73 @@ export type ResidentDirectoryStats = {
   messengerCount: number;
   filipinoCount: number;
   englishCount: number;
+  unknownLanguageCount: number;
 };
 
-export function formatPlatform(platform: ResidentPlatform) {
-  return platform === 'telegram' ? 'Telegram' : 'Messenger';
+export function formatResidentName(name: string | null) {
+  return name?.trim() || 'Unknown resident';
 }
 
-export function formatLanguage(language: ResidentLanguage) {
-  return language === 'fil' ? 'Filipino' : 'English';
+export function formatPlatform(platform: ResidentPlatform | null) {
+  if (platform === 'telegram') {
+    return 'Telegram';
+  }
+
+  if (platform === 'messenger') {
+    return 'Messenger';
+  }
+
+  return 'Unknown platform';
 }
 
-export function formatTimestamp(value: string) {
+export function formatLanguage(language: ResidentLanguage | null) {
+  if (language === 'fil') {
+    return 'Filipino';
+  }
+
+  if (language === 'eng') {
+    return 'English';
+  }
+
+  return 'Unknown language';
+}
+
+export function formatTimestamp(value: string | null) {
+  if (!value) {
+    return 'Unknown date';
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return 'Unknown date';
+  }
+
   return new Intl.DateTimeFormat('en-PH', {
     dateStyle: 'medium',
     timeStyle: 'short',
-  }).format(new Date(value));
+  }).format(date);
 }
 
-export function formatCoordinates(latitude: number, longitude: number) {
+export function formatCoordinates(
+  latitude: number | null,
+  longitude: number | null
+) {
+  if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+    return 'Unavailable';
+  }
+
   return `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
 }
 
-export function getInitials(name: string) {
-  const words = name.trim().split(/\s+/).filter(Boolean);
+export function getInitials(name: string | null) {
+  const source = name?.trim();
+
+  if (!source) {
+    return '?';
+  }
+
+  const words = source.split(/\s+/).filter(Boolean);
 
   if (words.length === 1) {
     return words[0].slice(0, 2).toUpperCase();
@@ -54,6 +98,20 @@ export function getInitials(name: string) {
 
 export function normalizeResidentSearchQuery(query: string) {
   return query.trim().toLowerCase();
+}
+
+function getResidentSearchText(resident: ResidentDirectoryRow) {
+  return [
+    formatResidentName(resident.name),
+    resident.id,
+    formatPlatform(resident.platform),
+    formatLanguage(resident.language),
+    resident.platformUserId ?? 'Unknown platform user ID',
+    resident.threadId ?? 'Unknown thread ID',
+    formatCoordinates(resident.latitude, resident.longitude),
+  ]
+    .join(' ')
+    .toLowerCase();
 }
 
 export function filterResidentDirectory(
@@ -74,17 +132,7 @@ export function filterResidentDirectory(
       return true;
     }
 
-    const haystack = [
-      resident.name,
-      resident.platform,
-      formatPlatform(resident.platform),
-      resident.platformUserId,
-      resident.threadId,
-    ]
-      .join(' ')
-      .toLowerCase();
-
-    return haystack.includes(normalizedQuery);
+    return getResidentSearchText(resident).includes(normalizedQuery);
   });
 }
 
@@ -93,6 +141,12 @@ export function getResidentDirectoryStats(
 ): ResidentDirectoryStats {
   const filipinoCount = residents.filter(
     (resident) => resident.language === 'fil'
+  ).length;
+  const englishCount = residents.filter(
+    (resident) => resident.language === 'eng'
+  ).length;
+  const unknownLanguageCount = residents.filter(
+    (resident) => !resident.language
   ).length;
 
   return {
@@ -104,6 +158,7 @@ export function getResidentDirectoryStats(
       (resident) => resident.platform === 'messenger'
     ).length,
     filipinoCount,
-    englishCount: residents.length - filipinoCount,
+    englishCount,
+    unknownLanguageCount,
   };
 }

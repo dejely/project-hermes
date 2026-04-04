@@ -26,6 +26,7 @@ import {
   formatLanguage,
   formatPlatform,
   formatTimestamp,
+  formatResidentName,
   getInitials,
 } from './residents-directory-utils';
 
@@ -45,12 +46,15 @@ function getResidentColumns(
               <AvatarFallback>{getInitials(resident.name)}</AvatarFallback>
             </Avatar>
             <div className="flex min-w-0 flex-col gap-1">
-              <span className="truncate font-medium">{resident.name}</span>
+              <span className="truncate font-medium">
+                {formatResidentName(resident.name)}
+              </span>
               <span className="truncate text-sm text-muted-foreground">
-                {formatPlatform(resident.platform)} · {resident.platformUserId}
+                {formatPlatform(resident.platform)} ·{' '}
+                {resident.platformUserId ?? 'Unavailable'}
               </span>
               <span className="truncate text-xs text-muted-foreground">
-                Thread · {resident.threadId}
+                Thread · {resident.threadId ?? 'Unavailable'}
               </span>
             </div>
           </div>

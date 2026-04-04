@@ -20,6 +20,7 @@ import {
   formatLanguage,
   formatPlatform,
   formatTimestamp,
+  formatResidentName,
   getInitials,
 } from './residents-directory-utils';
 
@@ -51,7 +52,7 @@ export function ResidentDetailSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-xl">
         <SheetHeader>
-          <SheetTitle>{resident.name}</SheetTitle>
+          <SheetTitle>{formatResidentName(resident.name)}</SheetTitle>
           <SheetDescription>
             Review the resident profile captured during onboarding, including
             platform identity and saved coordinates.
@@ -67,7 +68,9 @@ export function ResidentDetailSheet({
                 </Avatar>
                 <div className="flex min-w-0 flex-1 flex-col gap-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <CardTitle className="text-xl">{resident.name}</CardTitle>
+                    <CardTitle className="text-xl">
+                      {formatResidentName(resident.name)}
+                    </CardTitle>
                     <Badge variant="outline">
                       {formatPlatform(resident.platform)}
                     </Badge>
@@ -97,7 +100,7 @@ export function ResidentDetailSheet({
                   Platform user ID
                 </div>
                 <div className="mt-1 break-all text-sm font-medium">
-                  {resident.platformUserId}
+                  {resident.platformUserId ?? 'Unavailable'}
                 </div>
               </div>
               <div className="rounded-lg border p-3">
@@ -105,7 +108,7 @@ export function ResidentDetailSheet({
                   Thread ID
                 </div>
                 <div className="mt-1 break-all text-sm font-medium">
-                  {resident.threadId}
+                  {resident.threadId ?? 'Unavailable'}
                 </div>
               </div>
               <div className="rounded-lg border p-3">
@@ -113,7 +116,9 @@ export function ResidentDetailSheet({
                   Latitude
                 </div>
                 <div className="mt-1 text-sm font-medium">
-                  {resident.latitude.toFixed(6)}
+                  {typeof resident.latitude === 'number'
+                    ? resident.latitude.toFixed(6)
+                    : 'Unavailable'}
                 </div>
               </div>
               <div className="rounded-lg border p-3">
@@ -121,7 +126,9 @@ export function ResidentDetailSheet({
                   Longitude
                 </div>
                 <div className="mt-1 text-sm font-medium">
-                  {resident.longitude.toFixed(6)}
+                  {typeof resident.longitude === 'number'
+                    ? resident.longitude.toFixed(6)
+                    : 'Unavailable'}
                 </div>
               </div>
               <div className="rounded-lg border p-3 sm:col-span-2">

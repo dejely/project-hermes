@@ -5,14 +5,14 @@ export type ResidentLanguage = Enums<'resident_language'>;
 
 export type ResidentDirectoryRow = {
   id: string;
-  name: string;
-  platform: ResidentPlatform;
-  platformUserId: string;
-  threadId: string;
-  language: ResidentLanguage;
-  createdAt: string;
-  longitude: number;
-  latitude: number;
+  name: string | null;
+  platform: ResidentPlatform | null;
+  platformUserId: string | null;
+  threadId: string | null;
+  language: ResidentLanguage | null;
+  createdAt: string | null;
+  longitude: number | null;
+  latitude: number | null;
 };
 
 export type ResidentDirectoryFilters = {
