@@ -38,7 +38,7 @@ const disasterFacts = [
 
 export function StatSection() {
   return (
-    <section className="relative w-full overflow-hidden -mt-32">
+    <section className="relative w-full overflow-hidden -mt-40">
       <style>{`
         .stat-grid::before {
           content: '';
@@ -73,9 +73,18 @@ export function StatSection() {
 
       <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 pt-40 pb-16 md:pb-24">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16 max-w-7xl mx-auto">
-          {/* LEFT: 2x2 Stats Cards Grid */}
-          <div className="w-full lg:w-1/2">
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+          {/* LEFT: Heading + 2x2 Stats Cards Grid */}
+          <div className="w-full lg:w-1/2 flex flex-col gap-8">
+            {/* Section Heading */}
+            <div className="text-center lg:text-left">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+                The Philippines Faces{' '}
+                <span className="text-muted-foreground">Constant Threats</span>
+              </h2>
+            </div>
+
+            {/* 2x2 Cards */}
+            <div className="ml-12 grid grid-cols-2 gap-3 sm:gap-4 md:gap-6">
               {disasterFacts.map((fact, index) => (
                 <div
                   key={index}
