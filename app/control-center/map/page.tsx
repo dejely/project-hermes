@@ -19,6 +19,8 @@ type IncidentMapRow = Pick<
 > & {
   longitude: number | null;
   latitude: number | null;
+  description?: string | null;
+  incident_time?: string | null;
 };
 
 export default async function Page() {
@@ -63,7 +65,18 @@ export default async function Page() {
       incident.location_description ??
       `${incident.severity.toUpperCase()} · ${incident.status}`;
 
-    return [{ id: incident.id, longitude, latitude, label }];
+    return [
+      {
+        id: incident.id,
+        longitude,
+        latitude,
+        label,
+        severity: incident.severity,
+        status: incident.status,
+        description: incident.description ?? null,
+        incidentTime: incident.incident_time ?? null,
+      },
+    ];
   });
 
   return (
