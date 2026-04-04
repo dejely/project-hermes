@@ -111,9 +111,48 @@ export const incidentReportingFlow: Flow = {
       dataKey: 'location',
     },
     {
-      id: 'confirm',
-      type: 'confirmation',
-      prompt: 'Submitting your report...',
+      id: 'review_submission',
+      type: 'selection',
+      prompt: 'Please review your report before submission.',
+      renderContent: (data) => {
+        const incidentType =
+          typeof data.incidentTypeName === 'string'
+            ? data.incidentTypeName
+            : 'Unknown';
+        const severity =
+          typeof data.severity === 'string' ? data.severity : 'Unknown';
+        const description =
+          typeof data.description === 'string'
+            ? data.description
+            : 'Not provided';
+
+        const locationPoint = data.location as
+          | { type?: unknown; coordinates?: unknown }
+          | undefined;
+
+        const locationSummary =
+          locationPoint?.type === 'Point' &&
+          Array.isArray(locationPoint.coordinates) &&
+          typeof locationPoint.coordinates[0] === 'number' &&
+          typeof locationPoint.coordinates[1] === 'number'
+            ? `${locationPoint.coordinates[1]}, ${locationPoint.coordinates[0]}`
+            : 'Not provided';
+
+        return [
+          `Incident Type: ${incidentType}`,
+          `Severity: ${severity}`,
+          `Description: ${description}`,
+          `Location: ${locationSummary}`,
+          '',
+          'Submit this report?',
+        ].join('\n');
+      },
+      options: [
+        { label: 'Confirm and Submit', value: 'confirm' },
+        { label: 'Cancel', value: 'cancel' },
+      ],
+      validations: [required],
+      dataKey: 'submissionDecision',
     },
   ],
 
@@ -123,6 +162,17 @@ export const incidentReportingFlow: Flow = {
    */
   onComplete: async (data, thread: BotThread) => {
     try {
+      const submissionDecision = data.submissionDecision;
+      if (submissionDecision !== 'confirm') {
+        const { renderCard } = await import('../renderers/card-renderer');
+        await renderCard(thread, {
+          title: 'Cancelled',
+          content:
+            'Incident reporting has been cancelled. Send "report" anytime to start again.',
+        });
+        return;
+      }
+
       const incidentTypeName = data.incidentTypeName;
       const severity = data.severity;
       const description = data.description;
