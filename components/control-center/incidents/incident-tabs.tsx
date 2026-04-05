@@ -1,10 +1,17 @@
+/*
+NOTE: THIS IS A PLACEHOLDER COMPONENT UNTIL
+DIRECT CONNECTION WITH MESSAGING APPS IS INTEGRATED.
+
+NOT INDICATIVE OF THE FINAL PRODUCT.
+*/
+
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { fetchIncidents } from '@/lib/supabase/reports';
 import * as React from 'react';
 import KanbanContent from './kanban-view/content';
-import ChatBox from './report-view/chatbox';
+import { ChatBox } from './report-view/chatbox';
 import { ReportContainer } from './report-view/report-container';
 import IncidentCard from './report-view/report-list/incidents-card';
 
