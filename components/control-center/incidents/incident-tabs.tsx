@@ -11,17 +11,6 @@ interface TabsProps {
   defaultTab?: string;
 }
 
-// function getLatestIncident(): string | null {
-//   const latestIncident = fetchIncidents(1);
-//   let latestIncidentID: string | null = null;
-
-//   latestIncident.then((incident: Incident[] | null) => {
-//     if (incident) latestIncidentID = incident[0].id;
-//   });
-
-//   return latestIncidentID;
-// }
-
 export function IncidentTabs({ defaultTab = 'reports' }: TabsProps) {
   const [activeTab, setActiveTab] = React.useState(defaultTab);
   const [selectedIncidentID, setSelectedIncidentID] = React.useState<
