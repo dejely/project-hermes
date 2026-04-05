@@ -21,6 +21,10 @@ export function Location({ incidentID }: MapComponentProps) {
     string[] | undefined
   >(undefined);
   const mapRef = React.useRef<MapRef | null>(null);
+  const parsedCoord = {
+    lat: defaultLocation[1],
+    long: defaultLocation[0],
+  };
 
   React.useEffect(() => {
     const markIncidentLoc = async () => {
@@ -41,25 +45,42 @@ export function Location({ incidentID }: MapComponentProps) {
           zoom: 10,
           duration: 1500,
         });
-      else
+      else {
+        parsedCoord.lat = parseFloat(incidentLocation[1]);
+        parsedCoord.long = parseFloat(incidentLocation[0]);
         mapRef.current.flyTo({
-          center: [
-            parseFloat(incidentLocation[1]),
-            parseFloat(incidentLocation[0]),
-          ],
+          center: [parsedCoord.lat, parsedCoord.long],
           zoom: 15,
           duration: 1500,
         });
+      }
     };
     zoomInMarker();
   }, [incidentLocation]);
+
+  function zoomToMarker() {
+    if (
+      !mapRef ||
+      !mapRef.current ||
+      !incidentLocation ||
+      incidentLocation.length !== 2
+    )
+      return null;
+
+    mapRef.current.flyTo({
+      center: [parsedCoord.lat, parsedCoord.long],
+      zoom: 15,
+      duration: 1500,
+    });
+  }
 
   if (incidentLocation) {
     return (
       <Map ref={mapRef}>
         <MapMarker
-          latitude={parseFloat(incidentLocation[0])}
-          longitude={parseFloat(incidentLocation[1])}
+          latitude={parsedCoord.lat}
+          longitude={parsedCoord.long}
+          onClick={zoomToMarker}
         >
           <MarkerContent />
         </MapMarker>
