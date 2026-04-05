@@ -14,6 +14,15 @@ interface KanbanContentProps {
   className?: string;
 }
 
+// Map title to category status
+const categoryMap: Record<string, string> = {
+  New: 'new',
+  Validated: 'validated',
+  In_Progress: 'in_progress',
+  Resolved: 'resolved',
+  Dismissed: 'dismissed',
+};
+
 function KanbanContent({
   title,
   incidentCount = 50,
@@ -23,15 +32,6 @@ function KanbanContent({
   const [selectedIncident, setSelectedIncident] = useState<string | null>(null);
   const [incidents, setIncidents] = useState<Incident[] | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Map title to category status
-  const categoryMap: Record<string, string> = {
-    New: 'new',
-    Validated: 'validated',
-    In_Progress: 'in_progress',
-    Resolved: 'resolved',
-    Dismissed: 'dismissed',
-  };
 
   const handleIncidentClick = (id: string) => {
     setSelectedIncident(id);
