@@ -15,8 +15,8 @@ export const ReportContainer: React.FC<ReportContainerProps> = ({
   incident,
 }) => {
   return (
-    <Tabs defaultValue="reportDetails" className="w-full">
-      <TabsList variant="line" className="w-full">
+    <Tabs defaultValue="reportDetails" className="w-full border-1 rounded-xl">
+      <TabsList variant="default" className="w-full">
         <TabsTrigger value="reportDetails">Report Details</TabsTrigger>
         <TabsTrigger value="location">Location</TabsTrigger>
       </TabsList>
