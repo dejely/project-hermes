@@ -14,23 +14,34 @@ interface MapComponentProps {
   incidentID: string | null;
 }
 
+interface ParsedCoordinates {
+  lat: number;
+  long: number;
+}
+
 export function Location({ incidentID }: MapComponentProps) {
   // Note: need easy way for user to change values
-  const defaultLocation: number[] = [122.2333324, 10.6499974];
+  const defaultLocation: number[] = [10.6499974, 122.2333324];
   const [incidentLocation, setIncidentLocation] = React.useState<
     string[] | undefined
   >(undefined);
   const mapRef = React.useRef<MapRef | null>(null);
-  const parsedCoord = {
-    lat: defaultLocation[1],
-    long: defaultLocation[0],
-  };
+  const [parsedCoord, setParsedCoord] = React.useState<ParsedCoordinates>({
+    lat: defaultLocation[0],
+    long: defaultLocation[1],
+  });
 
   React.useEffect(() => {
     const markIncidentLoc = async () => {
       const incidents = await fetchIncidentById(incidentID);
       if (incidents)
         setIncidentLocation(hexToCoordinates(incidents.location)?.split(' '));
+      if (incidentLocation) {
+        setParsedCoord({
+          lat: parseFloat(incidentLocation[0]),
+          long: parseFloat(incidentLocation[1]),
+        });
+      }
     };
     markIncidentLoc();
   }, [incidentID]);
@@ -41,15 +52,14 @@ export function Location({ incidentID }: MapComponentProps) {
 
       if (!incidentLocation || incidentLocation.length !== 2)
         mapRef.current.flyTo({
-          center: [defaultLocation[0], defaultLocation[1]],
+          center: [defaultLocation[1], defaultLocation[0]],
           zoom: 10,
           duration: 1500,
         });
       else {
-        parsedCoord.lat = parseFloat(incidentLocation[1]);
-        parsedCoord.long = parseFloat(incidentLocation[0]);
+        console.log(parsedCoord);
         mapRef.current.flyTo({
-          center: [parsedCoord.lat, parsedCoord.long],
+          center: [parsedCoord.long, parsedCoord.lat],
           zoom: 15,
           duration: 1500,
         });
@@ -68,7 +78,7 @@ export function Location({ incidentID }: MapComponentProps) {
       return null;
 
     mapRef.current.flyTo({
-      center: [parsedCoord.lat, parsedCoord.long],
+      center: [parsedCoord.long, parsedCoord.lat],
       zoom: 15,
       duration: 1500,
     });
@@ -90,7 +100,7 @@ export function Location({ incidentID }: MapComponentProps) {
     return (
       <Map
         ref={mapRef}
-        center={[defaultLocation[0], defaultLocation[1]]}
+        center={[parsedCoord.long, parsedCoord.lat]}
         zoom={10}
       />
     );
