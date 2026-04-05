@@ -1,6 +1,12 @@
 import { AdvisoryCard } from '@/components/advisory-card';
 import { AdvisoryComposeForm } from '@/components/advisory-compose-form';
 import {
+  Map,
+  MapControls,
+  MapPolygonDraw,
+} from '@/components/control-center/map/map';
+import { Card } from '@/components/ui/card';
+import {
   getAdvisoryTemplates,
   getRecentAdvisories,
 } from '@/lib/advisories/data';
@@ -17,6 +23,13 @@ export default async function Page() {
     <div className="@container/main flex flex-1 flex-col gap-6 px-4 py-4 md:py-6 lg:px-6">
       <div className="grid gap-6 xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
         <AdvisoryComposeForm templates={templates} />
+
+        <Card className="h-80 overflow-hidden p-0">
+          <Map center={[121.0533, 14.6512]} zoom={11}>
+            <MapPolygonDraw />
+            <MapControls showZoom showCompass />
+          </Map>
+        </Card>
 
         <section className="flex flex-col gap-4">
           <h2 className="text-sm font-medium text-muted-foreground">
