@@ -1,3 +1,4 @@
+import { translate } from '@/lib/bot/i18n';
 import type { BotThread } from '@/lib/bot/types';
 import { pointToString } from '@/lib/geo';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -29,10 +30,17 @@ export const onboardingFlow: Flow = {
     {
       id: 'language',
       type: 'selection',
-      prompt: "What's your preferred language?",
+      renderPrompt: (_data, locale) =>
+        translate('onboarding.prompt.language', locale),
       options: [
-        { label: 'English', value: 'eng' },
-        { label: 'Filipino (Tagalog)', value: 'fil' },
+        {
+          label: translate('onboarding.language.english', 'eng'),
+          value: 'eng',
+        },
+        {
+          label: translate('onboarding.language.tagalog', 'eng'),
+          value: 'fil',
+        },
       ],
       validations: [isOneOf(['eng', 'fil'])],
       dataKey: 'language',
@@ -40,21 +48,24 @@ export const onboardingFlow: Flow = {
     {
       id: 'name',
       type: 'text',
-      prompt: "What's your name?",
+      renderPrompt: (_data, locale) =>
+        translate('onboarding.prompt.name', locale),
       validations: [required, compose(minLength(2), maxLength(100))],
       dataKey: 'name',
     },
     {
       id: 'location',
       type: 'location',
-      prompt: 'Where do you reside?',
+      renderPrompt: (_data, locale) =>
+        translate('onboarding.prompt.location', locale),
       validations: [isGeometryPoint],
       dataKey: 'location',
     },
     {
       id: 'confirm',
       type: 'confirmation',
-      prompt: 'Done!',
+      renderPrompt: (_data, locale) =>
+        translate('onboarding.prompt.confirm', locale),
     },
   ],
 
@@ -120,23 +131,31 @@ export const onboardingFlow: Flow = {
         throw new Error('Failed to save your data. Please try again later.');
       }
 
-      // Render success message using card renderer
+      // Render success message using card renderer in the resident's selected language
       const { renderCard } = await import('../renderers/card-renderer');
       await renderCard(thread, {
-        title: 'Welcome!',
-        content: 'Thank you for registering with Project Hermes.',
+        title: translate(
+          'onboarding.success.title',
+          language as ResidentLanguage
+        ),
+        content: translate(
+          'onboarding.success.message',
+          language as ResidentLanguage
+        ),
       });
     } catch (error) {
       console.error('Onboarding completion error:', error);
 
+      const locale =
+        data.language === 'fil' || data.language === 'eng'
+          ? data.language
+          : 'eng';
+
       // Render error message using card renderer
       const { renderCard } = await import('../renderers/card-renderer');
       await renderCard(thread, {
-        title: 'Error',
-        content:
-          error instanceof Error
-            ? error.message
-            : 'An error occurred. Please try again.',
+        title: translate('incident.error.title', locale),
+        content: translate('error.onboarding.fallback', locale),
       });
       throw error;
     }
@@ -147,9 +166,10 @@ export const onboardingFlow: Flow = {
    */
   onCancel: async (thread) => {
     const { renderCard } = await import('../renderers/card-renderer');
+    // Use English for cancel since we don't know the locale at this point
     await renderCard(thread, {
-      title: 'Cancelled',
-      content: 'Onboarding has been cancelled. You can start again anytime.',
+      title: translate('onboarding.cancel.title', 'eng'),
+      content: translate('onboarding.cancel.message', 'eng'),
     });
   },
 };

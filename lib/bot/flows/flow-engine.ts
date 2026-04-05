@@ -17,13 +17,18 @@ import type { Flow, FlowData, FlowThreadState } from './flow-types';
  */
 class FlowEngine {
   private resolveStepForRender(step: Step, state: FlowThreadState): Step {
-    const resolvedPrompt = step.renderPrompt?.(state.data) ?? step.prompt;
-    const resolvedContent = step.renderContent?.(state.data) ?? step.content;
+    const resolvedPrompt =
+      step.renderPrompt?.(state.data, state.locale) ?? step.prompt;
+    const resolvedContent =
+      step.renderContent?.(state.data, state.locale) ?? step.content;
+    const resolvedOptions =
+      step.renderOptions?.(state.data, state.locale) ?? step.options;
 
     return {
       ...step,
       prompt: resolvedPrompt,
       content: resolvedContent,
+      options: resolvedOptions,
     };
   }
 
@@ -109,6 +114,7 @@ class FlowEngine {
       stepIndex: targetStepIndex,
       data: this.pruneDataFromStep(flow, data, targetStepIndex),
       pendingReturnStepId: state.pendingReturnStepId,
+      locale: state.locale,
       startedAt: state.startedAt,
     };
   }
@@ -145,6 +151,7 @@ class FlowEngine {
   async handleStepInput(
     flow: Flow,
     state: FlowThreadState,
+    thread: BotThread,
     input: unknown
   ): Promise<{
     nextState: FlowThreadState;
@@ -156,7 +163,7 @@ class FlowEngine {
     const handler = stepHandlerRegistry.get(currentStep.type);
 
     // Parse input
-    const parseResult = await handler.parse(input, currentStep);
+    const parseResult = await handler.parse(input, currentStep, thread);
 
     if ('error' in parseResult) {
       // Validation failed - stay on same step
@@ -247,6 +254,7 @@ class FlowEngine {
       stepIndex: nextStepIndex,
       data: updatedData,
       pendingReturnStepId,
+      locale: state.locale,
       startedAt: state.startedAt,
       completedAt: isComplete ? Date.now() : undefined,
     };
@@ -279,6 +287,7 @@ class FlowEngine {
         stepIndex: nextStepIndex,
         data: state.data,
         pendingReturnStepId: state.pendingReturnStepId,
+        locale: state.locale,
         startedAt: state.startedAt,
         completedAt: isComplete ? Date.now() : undefined,
       },
@@ -288,8 +297,13 @@ class FlowEngine {
 
   /**
    * Create initial flow state.
+   * Optionally accepts a locale; defaults to 'eng' if not provided.
    */
-  createInitialState(flowId: string, flowVersion: number = 1): FlowThreadState {
+  createInitialState(
+    flowId: string,
+    flowVersion: number = 1,
+    locale: 'eng' | 'fil' = 'eng'
+  ): FlowThreadState {
     const flow = this.getFlow(flowId);
 
     // Find starting step index
@@ -307,6 +321,7 @@ class FlowEngine {
       stepIndex: startStepIndex,
       data: {},
       pendingReturnStepId: undefined,
+      locale,
     };
   }
 }
