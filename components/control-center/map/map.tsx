@@ -1223,6 +1223,7 @@ function MapHeatmapLayer<
 >({
   data,
   id: propId,
+  //Mapbox style na property
   colorRamp = [
     'interpolate',
     ['linear'],
@@ -1243,7 +1244,7 @@ function MapHeatmapLayer<
   intensity = 1,
 }: MapHeatmapLayerProps<P>) {
   const { map, isLoaded } = useMap();
-  const autoId = useId();
+  const autoId = useId(); //Generate unique id for react
   const id = propId ?? autoId;
   const sourceId = `heatmap-source-${id}`;
   const layerId = `heatmap-layer-${id}`;
@@ -1280,6 +1281,7 @@ function MapHeatmapLayer<
           fadeStartZoom,
           intensity * 1.15,
         ],
+        //Mapbox style na property
         'heatmap-color': colorRamp,
         'heatmap-radius': [
           'interpolate',
@@ -1350,6 +1352,7 @@ function MapHeatmapLayer<
       maxVisibleZoom,
       54,
     ]);
+
     map.setPaintProperty(layerId, 'heatmap-opacity', [
       'interpolate',
       ['linear'],

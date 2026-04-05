@@ -98,9 +98,11 @@ function IncidentMarkerCard({ marker }: { marker: IncidentMarker }) {
   );
 }
 
+//Severity heat map constants
 const MARKER_VISIBILITY_ZOOM = 13;
 const HEATMAP_FADE_END_ZOOM = 14;
 
+//Color for severity
 function getSeverityWeight(severity?: string | null) {
   switch (severity) {
     case 'critical':
@@ -146,6 +148,8 @@ export function InteractiveMap({ markers, destination }: InteractiveMapProps) {
     locationStatus === 'granted' || locationStatus === 'fallback'
       ? activeDestination
       : null;
+
+  //
   const heatmapData: GeoJSON.FeatureCollection<
     GeoJSON.Point,
     { id: string; weight: number; severity?: string | null }
@@ -400,7 +404,8 @@ export function InteractiveMap({ markers, destination }: InteractiveMapProps) {
               })
             : null}
 
-          {resolvedDestination ? (
+          {/* Dissapear the user location */}
+          {showIncidentMarkers && resolvedDestination ? (
             <MapMarker
               longitude={resolvedDestination.longitude}
               latitude={resolvedDestination.latitude}
