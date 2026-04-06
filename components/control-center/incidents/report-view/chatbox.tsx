@@ -143,7 +143,6 @@ export function ChatBox({
 
     if (!messageText || loading || isHistoryLoading || !incidentId) return;
 
-    setInput('');
     setLoading(true);
 
     try {
@@ -184,6 +183,8 @@ export function ChatBox({
           },
         ]);
       }
+
+      setInput('');
 
       // Call the callback if provided
       if (onSendMessage) {

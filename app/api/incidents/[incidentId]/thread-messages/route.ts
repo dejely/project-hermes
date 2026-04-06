@@ -7,6 +7,9 @@ import type { Database } from '@/types/supabase';
 
 type AdapterName = keyof typeof adapters;
 
+const CHAT_STATE_KEY_PREFIX = 'chat-sdk';
+const CHAT_MESSAGE_HISTORY_PREFIX = 'msg-history:';
+
 type ThreadMessageResponse = {
   id: string;
   content: string;
@@ -19,7 +22,73 @@ type ThreadResolution = {
   threadId: string;
 };
 
+type PersistedChatMessage = {
+  _type?: string;
+  id?: string;
+  text?: string;
+  author?: {
+    isMe?: boolean;
+  };
+  metadata?: {
+    dateSent?: string;
+  };
+  value?: string;
+};
+
 const MESSAGE_HISTORY_LIMIT = 100;
+
+function getChatHistoryListKey(threadId: string) {
+  return `${CHAT_MESSAGE_HISTORY_PREFIX}${threadId}`;
+}
+
+function parsePersistedChatMessage(
+  value: string
+): ThreadMessageResponse | null {
+  try {
+    const parsed = JSON.parse(value) as PersistedChatMessage;
+    const timestamp = parsed.metadata?.dateSent;
+
+    if (!parsed.id || !parsed.text || !timestamp) {
+      return null;
+    }
+
+    return {
+      id: parsed.id,
+      content: parsed.text,
+      role: parsed.author?.isMe ? 'assistant' : 'user',
+      timestamp,
+    };
+  } catch (error) {
+    console.error('Failed to parse persisted chat message:', error);
+    return null;
+  }
+}
+
+async function loadPersistedThreadMessages(threadId: string) {
+  const supabase = createAdminClient();
+  const listKey = getChatHistoryListKey(threadId);
+
+  const { data, error } = await supabase
+    .from('chat_state_lists')
+    .select('value, expires_at')
+    .eq('key_prefix', CHAT_STATE_KEY_PREFIX)
+    .eq('list_key', listKey)
+    .order('seq', { ascending: true });
+
+  if (error) {
+    throw error;
+  }
+
+  const now = Date.now();
+
+  return (data ?? [])
+    .filter(
+      (row) => !row.expires_at || new Date(row.expires_at).getTime() > now
+    )
+    .map((row) => parsePersistedChatMessage(row.value))
+    .filter((message): message is ThreadMessageResponse => message !== null)
+    .slice(-MESSAGE_HISTORY_LIMIT);
+}
 
 async function resolveIncidentThread(
   incidentId: string
@@ -114,25 +183,8 @@ export async function GET(
     return Response.json({ messages: [] });
   }
 
-  const messages: ThreadMessageResponse[] = [];
-
   try {
-    for await (const message of resolution.thread.allMessages) {
-      if (!message.text || !message.text.trim()) {
-        continue;
-      }
-
-      messages.push({
-        id: message.id,
-        content: message.text,
-        role: message.author.isMe ? 'assistant' : 'user',
-        timestamp: message.metadata.dateSent.toISOString(),
-      });
-
-      if (messages.length >= MESSAGE_HISTORY_LIMIT) {
-        break;
-      }
-    }
+    const messages = await loadPersistedThreadMessages(resolution.threadId);
 
     return Response.json({ messages });
   } catch (error) {
