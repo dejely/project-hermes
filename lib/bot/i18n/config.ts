@@ -3,7 +3,7 @@
  *
  * Update this list when adding or removing locale support.
  */
-export const SUPPORTED_LOCALES = ['eng', 'fil'] as const;
+export const SUPPORTED_LOCALES = ['eng', 'fil', 'hil'] as const;
 
 export type ResidentLocale = (typeof SUPPORTED_LOCALES)[number];
 
@@ -17,7 +17,8 @@ export const DEFAULT_LOCALE: ResidentLocale = 'eng';
  */
 export const LOCALE_LABELS: Record<ResidentLocale, string> = {
   eng: 'English',
-  fil: 'Filipino (Tagalog)',
+  fil: 'Filipino',
+  hil: 'Hiligaynon',
 };
 
 /**
