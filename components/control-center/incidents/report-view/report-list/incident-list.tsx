@@ -57,7 +57,7 @@ export function IncidentList({ onIncidentSelect, sort }: IncidentListProps) {
 
     loadIncidents();
     // All external variables used inside must be in the dependency array
-  }, [onIncidentSelect, setIncidents, setSelectedIncident]);
+  }, [onIncidentSelect, setIncidents, setSelectedIncident, sort]);
 
   const handleIncidentClick = (id: string) => {
     setSelectedIncident(id);
@@ -65,17 +65,17 @@ export function IncidentList({ onIncidentSelect, sort }: IncidentListProps) {
   };
 
   return (
-    <ScrollArea className={`h-full w-full rounded-md`}>
-      <div className="p-4">
+    <ScrollArea className="h-full w-full">
+      <div className="flex min-w-0 flex-col gap-2 p-3">
         {incidents.map((incident) => (
-          <React.Fragment key={incident.id}>
+          <div key={incident.id} className="min-w-0 w-full">
             <IncidentEntry
-              id={incident.incident_time}
+              incident={incident}
               isSelected={selectedIncident === incident.id}
-              onClick={() => handleIncidentClick(incident.id)}
+              onClick={handleIncidentClick}
             />
             <Separator className="my-2" />
-          </React.Fragment>
+          </div>
         ))}
       </div>
     </ScrollArea>

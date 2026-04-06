@@ -1,10 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FieldGroup } from '@/components/ui/field';
 import * as React from 'react';
 import { IncidentList } from './incident-list';
@@ -28,19 +22,17 @@ export default function IncidentsCard({ onIncidentSelect }: IncidentCardProps) {
     setSort([sortBy, order]);
   };
 
-  // TODO: refactor measurements to accept relative values
   return (
-    <Card className="flex w-full max-h-[calc(100vh-150px)] max-w-xs">
+    <Card className="flex h-full w-full flex-col">
       <CardHeader className="border-b">
         <CardTitle>Reports</CardTitle>
-        <FieldGroup className="flex flex-col flex-1">
+        <FieldGroup className="flex flex-col">
           <IncidentSorter onChangeSort={handleSortChange} />
         </FieldGroup>
       </CardHeader>
-      <CardContent className="h-[calc(100vh-275px)]">
+      <CardContent className="min-h-0 flex-1 p-0">
         <IncidentList onIncidentSelect={handleIncidentSelect} sort={sort} />
       </CardContent>
-      <CardFooter></CardFooter>
     </Card>
   );
 }

@@ -14,19 +14,27 @@ interface ReportContainerProps {
 export const ReportContainer: React.FC<ReportContainerProps> = ({
   incident,
 }) => {
+  const [activeTab, setActiveTab] = React.useState('reportDetails');
+
   return (
-    <Tabs defaultValue="reportDetails" className="w-full border-1 rounded-xl">
+    <Tabs
+      value={activeTab}
+      onValueChange={setActiveTab}
+      className="flex h-full w-full flex-col"
+    >
       <TabsList variant="default" className="w-full">
-        <TabsTrigger value="reportDetails">Report Details</TabsTrigger>
+        <TabsTrigger value="reportDetails">Details</TabsTrigger>
         <TabsTrigger value="location">Location</TabsTrigger>
       </TabsList>
-      <TabsContent value="reportDetails" className="max-h-[calc(100vh-225px)]">
+      <TabsContent value="reportDetails" className="m-0 min-h-0 flex-1">
         <ScrollArea className="h-full w-full">
           <ReportDetails incidentID={incident} />
         </ScrollArea>
       </TabsContent>
-      <TabsContent value="location">
-        <Location incidentID={incident} />
+      <TabsContent value="location" className="m-0 min-h-0 flex-1">
+        <div className="h-full w-full overflow-hidden">
+          <Location incidentID={incident} isActive={activeTab === 'location'} />
+        </div>
       </TabsContent>
     </Tabs>
   );

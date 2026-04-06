@@ -10,6 +10,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -40,7 +41,7 @@ export function ChatBox({
   isLoading = false,
   messages: initialMessages,
   title = 'Chat',
-  description = 'Ask me anything',
+  description = '',
 }: ChatBoxProps) {
   const [messages, setMessages] = useState<Message[]>(initialMessages ?? []);
   const [input, setInput] = useState('');
@@ -198,20 +199,20 @@ export function ChatBox({
   };
 
   return (
-    <Card className="flex flex-col h-full max-h-screen w-full">
-      {/* Header */}
+    <Card className="flex h-full w-full flex-col">
       <CardHeader className="border-b">
         <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardDescription>
+          {description || 'Incident thread conversation'}
+        </CardDescription>
       </CardHeader>
 
-      {/* Messages Area */}
-      <CardContent className="flex-1 overflow-hidden p-0">
+      <CardContent className="min-h-0 flex-1 p-0">
         <ScrollArea className="h-full w-full">
-          <div className="p-4 space-y-4">
+          <div className="flex flex-col gap-4 p-4">
             {messages.length === 0 && !isHistoryLoading ? (
-              <div className="flex items-center justify-center h-full text-center py-12">
-                <div className="space-y-2">
+              <div className="flex h-full items-center justify-center py-12 text-center">
+                <div className="flex flex-col gap-2">
                   <p className="text-muted-foreground">No messages yet</p>
                   <p className="text-sm text-muted-foreground">
                     Start a conversation by typing below
@@ -237,7 +238,7 @@ export function ChatBox({
                       <p className="text-sm wrap-break-word">
                         {message.content}
                       </p>
-                      <span className="text-xs opacity-70 mt-1 block">
+                      <span className="mt-1 block text-xs opacity-70">
                         {message.timestamp.toLocaleTimeString([], {
                           hour: '2-digit',
                           minute: '2-digit',
@@ -262,31 +263,28 @@ export function ChatBox({
         </ScrollArea>
       </CardContent>
 
-      {/* Input Area */}
-      <Card className="border-t m-0 rounded-none">
-        <CardContent className="p-4">
-          <form onSubmit={handleSendMessage} className="flex gap-2">
-            <Input
-              placeholder="Type your message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              disabled={loading || isHistoryLoading}
-              className="flex-1"
-            />
-            <Button
-              type="submit"
-              disabled={loading || isHistoryLoading || !input.trim()}
-              size="icon"
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+      <CardFooter className="border-t p-3">
+        <form onSubmit={handleSendMessage} className="flex w-full gap-2">
+          <Input
+            placeholder="Type your message..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            disabled={loading || isHistoryLoading}
+            className="flex-1"
+          />
+          <Button
+            type="submit"
+            disabled={loading || isHistoryLoading || !input.trim()}
+            size="icon"
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </Button>
+        </form>
+      </CardFooter>
     </Card>
   );
 }
