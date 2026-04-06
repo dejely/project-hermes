@@ -16,7 +16,7 @@ export function SiteHeader() {
           <ThemeSwitcher />
         </div>
       </div>
-      <RealtimeAvatarStack roomName="break_rooam" />
+      <RealtimeAvatarStack roomName="break_roam" />
     </header>
   );
 }

@@ -12,12 +12,12 @@ import { cn } from '@/lib/utils';
 const avatarStackVariants = cva('flex -space-x-4 -space-y-4', {
   variants: {
     orientation: {
-      vertical: 'flex-row',
-      horizontal: 'flex-col',
+      vertical: 'flex-col',
+      horizontal: 'flex-row',
     },
   },
   defaultVariants: {
-    orientation: 'vertical',
+    orientation: 'horizontal',
   },
 });
 
@@ -25,7 +25,7 @@ export interface AvatarStackProps
   extends
     React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof avatarStackVariants> {
-  avatars: { name: string; image: string }[];
+  avatars: { id: string; name: string; image: string | null }[];
   maxAvatarsAmount?: number;
 }
 
@@ -44,15 +44,15 @@ const AvatarStack = ({
       className={cn(
         avatarStackVariants({ orientation }),
         className,
-        orientation === 'horizontal' ? '-space-x-0' : '-space-y-0'
+        orientation === 'horizontal' ? '-space-y-0' : '-space-x-0'
       )}
       {...props}
     >
-      {shownAvatars.map(({ name, image }, index) => (
-        <Tooltip key={`${name}-${image}-${index}`}>
+      {shownAvatars.map(({ id, name, image }) => (
+        <Tooltip key={id}>
           <TooltipTrigger asChild>
             <Avatar className="hover:z-10">
-              <AvatarImage src={image} />
+              <AvatarImage src={image ?? undefined} />
               <AvatarFallback>
                 {name
                   ?.split(' ')
@@ -78,8 +78,8 @@ const AvatarStack = ({
             </Avatar>
           </TooltipTrigger>
           <TooltipContent>
-            {hiddenAvatars.map(({ name }, index) => (
-              <p key={`${name}-${index}`}>{name}</p>
+            {hiddenAvatars.map(({ id, name }) => (
+              <p key={id}>{name}</p>
             ))}
           </TooltipContent>
         </Tooltip>
