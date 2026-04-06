@@ -1,3 +1,4 @@
+import type { ResidentLocale } from '@/lib/bot/i18n';
 import { localizeIncidentSeverity, translate } from '@/lib/bot/i18n';
 import type { BotThread } from '@/lib/bot/types';
 import type { Point } from '@/types/geo';
@@ -129,7 +130,7 @@ async function hydrateIncidentReportingFlowOptions(): Promise<void> {
   severityStep.options = INCIDENT_SEVERITY_OPTIONS;
 }
 
-function localizeIncidentReviewStep(locale: 'eng' | 'fil'): void {
+function localizeIncidentReviewStep(locale: ResidentLocale): void {
   const localizedFields = [
     {
       targetStepId: 'incident_type',
@@ -169,7 +170,10 @@ function localizeIncidentReviewStep(locale: 'eng' | 'fil'): void {
       data,
       translate('incident.review.footer', renderLocale)
     );
-  incidentReviewEditStep.prompt = translate('incident.review.edit_prompt', locale);
+  incidentReviewEditStep.prompt = translate(
+    'incident.review.edit_prompt',
+    locale
+  );
   incidentReviewEditStep.options = localizedFields.map((field, index) => ({
     label: field.label,
     value: `f${index}`,
