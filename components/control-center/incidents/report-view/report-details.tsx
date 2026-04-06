@@ -230,14 +230,7 @@ export default function ReportDetails({ incidentID }: ReportDetailsProps) {
         </Field>
         <Field>
           <FieldLabel htmlFor="formIncidentType">Incident Type</FieldLabel>
-          <Select
-            value={formData.incident_name}
-            onValueChange={(value) =>
-              handleSelectChange('incident_name', value)
-            }
-            name="incident_name"
-            disabled
-          >
+          <Select value={formData.incident_name} name="incident_name" disabled>
             <SelectTrigger className="w-full" id="formIncidentType">
               <SelectValue placeholder="--Select Incident Type--" />
             </SelectTrigger>
@@ -265,7 +258,6 @@ export default function ReportDetails({ incidentID }: ReportDetailsProps) {
             type="text"
             defaultValue={formData.reported_by}
             placeholder="-- Reported By --"
-            onChange={handleInputChange}
             name="reported_by"
             disabled
           />
@@ -305,7 +297,6 @@ export default function ReportDetails({ incidentID }: ReportDetailsProps) {
             id="formIncidentTime"
             type="datetime-local"
             defaultValue={formData.incident_time}
-            onChange={handleInputChange}
             disabled
             name="incident_time"
           />
