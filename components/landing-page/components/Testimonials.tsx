@@ -13,10 +13,10 @@ type Testimonial = {
 
 const testimonials: Testimonial[] = [
   {
-    name: 'Maria Santos',
+    name: 'Conrado Santos',
     role: 'Resident',
     image:
-      'https://api.dicebear.com/7.x/lorelei/svg?seed=MariaSantos&backgroundColor=d1d5db',
+      'https://api.dicebear.com/7.x/lorelei/svg?seed=ConradoSantos&backgroundColor=d1d5db',
     quote:
       'I just sent a message about an incident, and it was instantly understood and logged. I received updates quickly, which made me feel safe.',
   },
@@ -26,7 +26,7 @@ const testimonials: Testimonial[] = [
     image:
       'https://api.dicebear.com/7.x/lorelei/svg?seed=CarloReyes&backgroundColor=d1d5db',
     quote:
-      'Reports now come in structured and ready for action. It significantly improves our response time.',
+      'The system organizes reports automatically, saving us valuable time. We can focus more on responding rather than sorting data.',
   },
   {
     name: 'John Dela Cruz',
@@ -45,7 +45,7 @@ const testimonials: Testimonial[] = [
       'The real-time dashboard and map help us respond faster on the ground. Coordination has never been this smooth.',
   },
   {
-    name: 'Ana Lopez',
+    name: 'John Lucio',
     role: 'Barangay Official',
     image:
       'https://api.dicebear.com/7.x/lorelei/svg?seed=AnaLopez&backgroundColor=d1d5db',
@@ -58,13 +58,16 @@ const testimonials: Testimonial[] = [
     image:
       'https://api.dicebear.com/7.x/lorelei/svg?seed=RamonFlores&backgroundColor=d1d5db',
     quote:
-      'During medical emergencies, every second counts. This system lets us coordinate with responders instantly and ensures no report gets lost in the chaos.',
+      'During medical emergencies, every second counts. This system lets us coordinate with responders instantly.',
   },
 ];
 
 export function TestimonialsSection() {
   return (
-    <section id="testimonials" className="py-24 sm:py-32">
+    <section
+      id="testimonials"
+      className="-mt-20 py-24 sm:py-32 relative w-full"
+    >
       <div className="container mx-auto px-8 sm:px-6">
         {/* Section Header */}
         <div className="mx-auto max-w-2xl text-center mb-16">
