@@ -1,9 +1,14 @@
-with country_bounds as (
-  select
-    116.9000::double precision as min_lng,
-    126.6000::double precision as max_lng,
-    4.6000::double precision as min_lat,
-    21.2000::double precision as max_lat
+with municipalities as (
+  select *
+  from (
+    values
+      -- municipality, min_lng, max_lng, min_lat, max_lat
+      ('Miag-ao',     122.2000::double precision, 122.2550::double precision, 10.6200::double precision, 10.6650::double precision),
+      ('Guimbal',     122.3000::double precision, 122.3450::double precision, 10.6450::double precision, 10.6850::double precision),
+      ('Tigbauan',    122.3550::double precision, 122.4050::double precision, 10.6550::double precision, 10.7000::double precision),
+      ('Igbaras',     122.1450::double precision, 122.1950::double precision, 10.6750::double precision, 10.7150::double precision),
+      ('San Joaquin', 122.0750::double precision, 122.1250::double precision, 10.5700::double precision, 10.6150::double precision)
+  ) as t(municipality, min_lng, max_lng, min_lat, max_lat)
 ),
 
 incident_type_pool as (
@@ -11,30 +16,26 @@ incident_type_pool as (
   from public.incident_types
 ),
 
-generated as (
+random_points as (
   select
     gs.n,
-
-    -- spread points across the whole country using a wide grid + slight randomness
-    cb.min_lng
-      + (((gs.n - 1) % 100) * ((cb.max_lng - cb.min_lng) / 99.0))
-      + ((random() - 0.5) * ((cb.max_lng - cb.min_lng) / 250.0)) as lng,
-
-    cb.min_lat
-      + (floor((gs.n - 1) / 100) * ((cb.max_lat - cb.min_lat) / 49.0))
-      + ((random() - 0.5) * ((cb.max_lat - cb.min_lat) / 180.0)) as lat,
-
-    -- mostly low / moderate severity
+    m.municipality,
+    m.min_lng + random() * (m.max_lng - m.min_lng) as lng,
+    m.min_lat + random() * (m.max_lat - m.min_lat) as lat,
     case
-      when random() < 0.60 then 'low'
-      when random() < 0.88 then 'moderate'
-      when random() < 0.97 then 'high'
+      when random() < 0.70 then 'low'
+      when random() < 0.93 then 'moderate'
+      when random() < 0.99 then 'high'
       else 'critical'
     end as severity,
-
-    ((gs.n - 1) % (select count(*) from incident_type_pool)) + 1 as incident_type_seq
-  from country_bounds cb
-  cross join generate_series(1, 5000) as gs(n)
+    1 + floor(random() * (select count(*) from incident_type_pool))::int as incident_type_seq
+  from generate_series(1, 25) as gs(n)
+  cross join lateral (
+    select municipality, min_lng, max_lng, min_lat, max_lat
+    from municipalities
+    order by random()
+    limit 1
+  ) m
 )
 
 insert into public.incidents (
@@ -48,15 +49,12 @@ insert into public.incidents (
 )
 select
   it.id,
-  ST_SetSRID(
-    ST_MakePoint(g.lng, g.lat),
-    4326
-  )::geography,
-  'Philippines',
-  g.severity::public.incident_severity,
-  it.name || ' reported somewhere in the Philippines (nationwide seed #' || g.n || ').',
+  ST_SetSRID(ST_MakePoint(rp.lng, rp.lat), 4326)::geography,
+  rp.municipality || ', Iloilo',
+  rp.severity::public.incident_severity,
+  it.name || ' reported in ' || rp.municipality || ' (random seed #' || rp.n || ')',
   'new'::public.incident_status,
-  now() - ((floor(random() * 720))::text || ' hours')::interval
-from generated g
+  now() - ((floor(random() * 240))::text || ' hours')::interval
+from random_points rp
 join incident_type_pool it
-  on it.seq = g.incident_type_seq;
+  on it.seq = rp.incident_type_seq;

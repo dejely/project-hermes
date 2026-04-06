@@ -1063,6 +1063,10 @@ type MapRouteProps = {
   coordinates: [number, number][];
   /** Line color as CSS color value (default: "#4285F4") */
   color?: string;
+  /** Optional casing color rendered behind the main route line */
+  casingColor?: string;
+  /** Optional casing width in pixels rendered behind the main route line */
+  casingWidth?: number;
   /** Line width in pixels (default: 3) */
   width?: number;
   /** Line opacity from 0 to 1 (default: 0.8) */
@@ -1083,6 +1087,8 @@ function MapRoute({
   id: propId,
   coordinates,
   color = '#4285F4',
+  casingColor,
+  casingWidth,
   width = 3,
   opacity = 0.8,
   dashArray,
@@ -1095,6 +1101,7 @@ function MapRoute({
   const autoId = useId();
   const id = propId ?? autoId;
   const sourceId = `route-source-${id}`;
+  const casingLayerId = `route-casing-layer-${id}`;
   const layerId = `route-layer-${id}`;
 
   // Add source and layer on mount
@@ -1109,6 +1116,20 @@ function MapRoute({
         geometry: { type: 'LineString', coordinates: [] },
       },
     });
+
+    if (casingColor && casingWidth && casingWidth > width) {
+      map.addLayer({
+        id: casingLayerId,
+        type: 'line',
+        source: sourceId,
+        layout: { 'line-join': 'round', 'line-cap': 'round' },
+        paint: {
+          'line-color': casingColor,
+          'line-width': casingWidth,
+          'line-opacity': opacity,
+        },
+      });
+    }
 
     map.addLayer({
       id: layerId,
@@ -1126,13 +1147,25 @@ function MapRoute({
     return () => {
       try {
         if (map.getLayer(layerId)) map.removeLayer(layerId);
+        if (map.getLayer(casingLayerId)) map.removeLayer(casingLayerId);
         if (map.getSource(sourceId)) map.removeSource(sourceId);
       } catch {
         // ignore
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, map]);
+  }, [
+    casingColor,
+    casingLayerId,
+    casingWidth,
+    color,
+    dashArray,
+    isLoaded,
+    map,
+    opacity,
+    sourceId,
+    width,
+  ]);
 
   // When coordinates change, update the source data
   useEffect(() => {
@@ -1157,7 +1190,23 @@ function MapRoute({
     if (dashArray) {
       map.setPaintProperty(layerId, 'line-dasharray', dashArray);
     }
-  }, [isLoaded, map, layerId, color, width, opacity, dashArray]);
+    if (map.getLayer(casingLayerId) && casingColor && casingWidth) {
+      map.setPaintProperty(casingLayerId, 'line-color', casingColor);
+      map.setPaintProperty(casingLayerId, 'line-width', casingWidth);
+      map.setPaintProperty(casingLayerId, 'line-opacity', opacity);
+    }
+  }, [
+    casingColor,
+    casingLayerId,
+    casingWidth,
+    color,
+    dashArray,
+    isLoaded,
+    layerId,
+    map,
+    opacity,
+    width,
+  ]);
 
   // Handle click and hover events
   useEffect(() => {
