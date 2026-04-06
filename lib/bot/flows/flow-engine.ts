@@ -203,7 +203,8 @@ class FlowEngine {
       const patch = await currentStep.onAfterParse(
         parseResult.value,
         updatedData,
-        input
+        input,
+        thread
       );
       if (patch) {
         updatedData = {

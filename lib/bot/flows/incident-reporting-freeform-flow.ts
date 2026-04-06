@@ -1,8 +1,9 @@
 import type { ResidentLocale } from '@/lib/bot/i18n';
 import { localizeIncidentSeverity, translate } from '@/lib/bot/i18n';
 import type { BotThread } from '@/lib/bot/types';
-import { toPoint } from '@/lib/geo';
+import { parsePointWkt, toPoint } from '@/lib/geo';
 import { createDefaultGeocodingService } from '@/lib/geocoding';
+import { createAdminClient } from '@/lib/supabase/admin';
 import {
   compose,
   isGeometryPoint,
@@ -24,6 +25,46 @@ import {
 } from './incident-reporting-service';
 
 const geocodingService = createDefaultGeocodingService();
+
+async function resolveResidentHomeContext(
+  thread: BotThread,
+  locale: ResidentLocale
+): Promise<string | undefined> {
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase
+    .from('residents')
+    .select('location')
+    .eq('thread_id', thread.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error(
+      'Failed to load resident location for freeform parsing:',
+      error
+    );
+    return undefined;
+  }
+
+  const residentLocation =
+    parsePointWkt(data?.location) ?? toPoint(data?.location);
+
+  if (!residentLocation) {
+    return undefined;
+  }
+
+  try {
+    const result = await geocodingService.reverseGeocode(residentLocation, {
+      language: locale,
+      addressDetails: true,
+    });
+
+    return result?.displayName?.trim() || undefined;
+  } catch (error) {
+    console.error('Failed to reverse geocode resident home location:', error);
+    return undefined;
+  }
+}
 
 function getFreeformLocationSummary(data: Record<string, unknown>): string {
   const locationPoint = data.parsedLocation as
@@ -176,15 +217,21 @@ export const incidentReportingFreeformFlow: Flow = {
       dataKey: 'freeformReportText',
       allowImageAttachments: true,
       allowAudioAttachments: true,
-      onAfterParse: async (value, _data, input) => {
+      onAfterParse: async (value, _data, input, thread) => {
         if (typeof value !== 'string' && typeof value !== 'undefined') {
           throw new Error('Invalid report format. Please try again.');
         }
+
+        const locale = thread ? await getThreadLocale(thread) : 'eng';
+        const residentHomeContext = thread
+          ? await resolveResidentHomeContext(thread, locale)
+          : undefined;
 
         const incidentTypeNames = await fetchIncidentTypeNames();
         const parsed = await parseFreeformIncidentReport({
           input,
           allowedIncidentTypeNames: incidentTypeNames,
+          residentHomeContext,
         });
 
         let parsedLocation: ReturnType<typeof toPoint>;
