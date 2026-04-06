@@ -299,8 +299,52 @@ with resident_seed as (
     'thread_' || lpad(n::text, 4, '0') as thread_id,
     'Resident ' || lpad(n::text, 3, '0') as name,
     case when n % 3 = 0 then 'eng'::public.resident_language else 'fil'::public.resident_language end as language,
-    (120.58 + ((n % 10) * 0.006) + ((n % 3) * 0.0015))::double precision as lon,
-    (10.60 + ((n % 7) * 0.007) + ((n % 5) * 0.0012))::double precision as lat,
+    (
+      case ((n - 1) % 10)
+        when 0 then 122.23505 -- Miagao poblacion (inland-ish)
+        when 1 then 122.21050 -- Igbaras
+        when 2 then 122.27620 -- Guimbal
+        when 3 then 122.29390 -- Tigbauan
+        when 4 then 122.25860 -- Oton
+        when 5 then 122.19240 -- San Joaquin
+        when 6 then 122.24190 -- Miagao upland (Tapaz-bound side)
+        when 7 then 122.22400 -- Miagao east
+        when 8 then 122.26950 -- Pavia-ish
+        else 122.23080 -- Miagao north
+      end
+      + (
+        (
+          abs(('x' || substr(md5('resident-jitter-lon-' || n::text), 1, 8))::bit(32)::int)::double precision
+          / 2147483647.0
+        ) - 0.5
+      ) * 0.03
+    )::double precision as lon,
+    least(
+      greatest(
+      (
+        case ((n - 1) % 10)
+          when 0 then 10.64078
+          when 1 then 10.71480
+          when 2 then 10.66340
+          when 3 then 10.67490
+          when 4 then 10.69230
+          when 5 then 10.63540
+          when 6 then 10.66490
+          when 7 then 10.65210
+          when 8 then 10.77660
+          else 10.69850
+        end
+      + (
+          (
+            abs(('x' || substr(md5('resident-jitter-lat-' || n::text), 1, 8))::bit(32)::int)::double precision
+            / 2147483647.0
+          ) - 0.5
+      ) * 0.022
+      )::double precision,
+      10.69
+      ),
+      10.83
+    ) as lat,
     timezone('utc', now()) - ((n * 31) % 2200) * interval '1 hour' as created_at
   from generate_series(1, 70) as gs(n)
 )
@@ -349,8 +393,56 @@ incident_seed as (
       when 6 then '20000000-0000-4000-8000-000000000006'::uuid
       else '20000000-0000-4000-8000-000000000007'::uuid
     end as incident_type_id,
-    (120.59 + ((n % 11) * 0.005) + ((n % 4) * 0.0012))::double precision as lon,
-    (10.61 + ((n % 9) * 0.0065) + ((n % 5) * 0.0011))::double precision as lat,
+    (
+      case ((n - 1) % 12)
+        when 0 then 122.23505 -- Miagao
+        when 1 then 122.21050 -- Igbaras
+        when 2 then 122.27620 -- Guimbal
+        when 3 then 122.29390 -- Tigbauan
+        when 4 then 122.25860 -- Oton
+        when 5 then 122.19240 -- San Joaquin
+        when 6 then 122.16570 -- Sibalom side (inland)
+        when 7 then 122.24190 -- Miagao upland
+        when 8 then 122.22400 -- Miagao east
+        when 9 then 122.26950 -- Pavia-ish
+        when 10 then 122.29750 -- Leganes-ish (inland)
+        else 122.23080 -- Miagao north
+      end
+      + (
+        (
+          abs(('x' || substr(md5('incident-jitter-lon-' || n::text), 1, 8))::bit(32)::int)::double precision
+          / 2147483647.0
+        ) - 0.5
+      ) * 0.04
+    )::double precision as lon,
+    least(
+      greatest(
+      (
+        case ((n - 1) % 12)
+          when 0 then 10.64078
+          when 1 then 10.71480
+          when 2 then 10.66340
+          when 3 then 10.67490
+          when 4 then 10.69230
+          when 5 then 10.63540
+          when 6 then 10.79070
+          when 7 then 10.66490
+          when 8 then 10.65210
+          when 9 then 10.77660
+          when 10 then 10.81680
+          else 10.69850
+        end
+      + (
+          (
+            abs(('x' || substr(md5('incident-jitter-lat-' || n::text), 1, 8))::bit(32)::int)::double precision
+            / 2147483647.0
+          ) - 0.5
+      ) * 0.026
+      )::double precision,
+      10.69
+      ),
+      10.83
+    ) as lat,
     'Barangay zone ' || ((n % 20) + 1) as location_description,
     case
       when n % 10 in (0, 1) then 'new'::public.incident_status
