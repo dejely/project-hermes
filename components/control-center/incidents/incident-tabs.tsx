@@ -1,11 +1,11 @@
 'use client';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from '@/components/ui/resizable';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { fetchIncidents } from '@/lib/supabase/reports';
 import * as React from 'react';
@@ -35,33 +35,45 @@ export function IncidentTabs() {
   };
 
   return (
-    <Tabs defaultValue="reports" className="w-full">
-      <TabsList variant="line" className="w-full flex flex-1 flex-row">
+    <Tabs defaultValue="reports" className="flex w-full min-h-0 flex-col gap-2">
+      <TabsList variant="line" className="w-full shrink-0 flex-row">
         <TabsTrigger value="reports">Reports</TabsTrigger>
         <TabsTrigger value="kanban">Kanban</TabsTrigger>
       </TabsList>
-      <TabsContent value="reports" className="w-full">
+      <TabsContent value="reports" className="m-0 w-full min-h-0">
         {isMobile ? (
           <div className="flex w-full flex-col gap-4">
-            <IncidentCard onIncidentSelect={handleOnIncidentClick} />
-            <ChatBox incidentId={selectedIncidentID} />
-            <ReportContainer incident={selectedIncidentID} />
+            <div className="h-[calc(100vh-140px)] max-h-[calc(100vh-140px)] overflow-hidden">
+              <IncidentCard onIncidentSelect={handleOnIncidentClick} />
+            </div>
+            <div className="h-[calc(100vh-140px)] max-h-[calc(100vh-140px)] overflow-hidden">
+              <ChatBox incidentId={selectedIncidentID} />
+            </div>
+            <div className="h-[calc(100vh-140px)] max-h-[calc(100vh-140px)] overflow-hidden">
+              <ReportContainer incident={selectedIncidentID} />
+            </div>
           </div>
         ) : (
           <ResizablePanelGroup
             orientation="horizontal"
-            className="min-h-[calc(100vh-180px)] w-full rounded-xl border"
+            className="h-[calc(100vh-140px)] max-h-[calc(100vh-140px)] w-full rounded-xl border bg-background"
           >
-            <ResizablePanel defaultSize="24%" minSize="20%">
-              <IncidentCard onIncidentSelect={handleOnIncidentClick} />
+            <ResizablePanel defaultSize="33%" minSize="20%">
+              <div className="h-full min-h-0 overflow-hidden p-3">
+                <IncidentCard onIncidentSelect={handleOnIncidentClick} />
+              </div>
             </ResizablePanel>
             <ResizableHandle withHandle />
             <ResizablePanel defaultSize="33%" minSize="25%">
-              <ChatBox incidentId={selectedIncidentID} />
+              <div className="h-full min-h-0 overflow-hidden p-3">
+                <ChatBox incidentId={selectedIncidentID} />
+              </div>
             </ResizablePanel>
             <ResizableHandle withHandle />
-            <ResizablePanel defaultSize="43%" minSize="30%">
-              <ReportContainer incident={selectedIncidentID} />
+            <ResizablePanel defaultSize="33%" minSize="30%">
+              <div className="h-full min-h-0 overflow-hidden p-3">
+                <ReportContainer incident={selectedIncidentID} />
+              </div>
             </ResizablePanel>
           </ResizablePanelGroup>
         )}
