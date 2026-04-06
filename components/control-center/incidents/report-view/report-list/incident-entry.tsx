@@ -88,19 +88,19 @@ export function IncidentEntry({
       role="button"
       tabIndex={0}
       className={cn(
-        'w-full cursor-pointer gap-3 py-4 text-left transition focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none hover:border-primary/40 hover:shadow-md',
+        'min-w-0 w-full cursor-pointer gap-3 overflow-hidden py-4 text-left transition focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none hover:border-primary/40 hover:shadow-md',
         isSelected && 'border-primary bg-accent/30 ring-1 ring-primary/40'
       )}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       aria-pressed={isSelected}
     >
-      <CardHeader className="px-4">
-        <div className="flex items-start justify-between gap-3">
-          <CardTitle className="text-sm leading-tight">
+      <CardHeader className="px-4 mb-0">
+        <div className="flex min-w-0 items-start justify-between gap-3">
+          <CardTitle className="min-w-0 flex-1 mb-0 text-sm leading-tight wrap-anywhere">
             {incidentType}
           </CardTitle>
-          <div className="flex flex-wrap items-center justify-end gap-1.5">
+          <div className="shrink-0 flex flex-wrap items-center justify-end gap-1.5">
             <Badge variant={getSeverityVariant(incident.severity)}>
               {formatLabel(incident.severity)}
             </Badge>
@@ -113,14 +113,14 @@ export function IncidentEntry({
 
       <CardContent className="px-4">
         <div className="flex flex-col gap-1.5 text-xs text-muted-foreground">
-          <CardDescription className="truncate text-xs">
+          <CardDescription className="whitespace-normal text-xs wrap-anywhere">
             Reported by: {reportedBy}
           </CardDescription>
           <CardDescription className="text-xs">
             {formatIncidentTime(incident.incident_time)}
           </CardDescription>
           {incident.location_description && (
-            <CardDescription className="truncate text-xs">
+            <CardDescription className="whitespace-normal text-xs wrap-anywhere">
               Location: {incident.location_description}
             </CardDescription>
           )}
@@ -129,7 +129,7 @@ export function IncidentEntry({
 
       {incident.description && (
         <CardFooter className="px-4 pt-0">
-          <p className="truncate text-xs text-foreground/80">
+          <p className="whitespace-normal text-xs text-foreground/80 wrap-anywhere">
             {incident.description}
           </p>
         </CardFooter>

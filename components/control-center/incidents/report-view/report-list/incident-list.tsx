@@ -66,16 +66,16 @@ export function IncidentList({ onIncidentSelect, sort }: IncidentListProps) {
 
   return (
     <ScrollArea className="h-full w-full">
-      <div className="flex flex-col gap-2 p-3">
+      <div className="flex min-w-0 flex-col gap-2 p-3">
         {incidents.map((incident) => (
-          <React.Fragment key={incident.id}>
+          <div key={incident.id} className="min-w-0 w-full">
             <IncidentEntry
               incident={incident}
               isSelected={selectedIncident === incident.id}
               onClick={handleIncidentClick}
             />
             <Separator className="my-2" />
-          </React.Fragment>
+          </div>
         ))}
       </div>
     </ScrollArea>
