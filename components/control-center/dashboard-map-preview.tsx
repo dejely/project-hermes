@@ -2,12 +2,7 @@
 
 import Link from 'next/link';
 
-import {
-  Map,
-  MapControls,
-  MapMarker,
-  MarkerContent,
-} from '@/components/control-center/map/map';
+import { IncidentMapSceneShell } from '@/components/control-center/map/incident-map-scene-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,14 +14,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import type { DashboardPayload } from '@/lib/control-center-dashboard';
-import type { Enums } from '@/types/supabase';
-
-function severityClass(severity: Enums<'incident_severity'> | null) {
-  if (severity === 'critical') return 'bg-red-600';
-  if (severity === 'high') return 'bg-orange-500';
-  if (severity === 'moderate') return 'bg-yellow-400';
-  return 'bg-emerald-500';
-}
 
 type DashboardMapPreviewProps = {
   mapMarkers: DashboardPayload['mapMarkers'];
@@ -34,10 +21,6 @@ type DashboardMapPreviewProps = {
 
 export function DashboardMapPreview({ mapMarkers }: DashboardMapPreviewProps) {
   const markerCount = mapMarkers.markers.length;
-  const center: [number, number] =
-    markerCount > 0
-      ? [mapMarkers.markers[0].longitude, mapMarkers.markers[0].latitude]
-      : [mapMarkers.destination.longitude, mapMarkers.destination.latitude];
 
   return (
     <Card>
@@ -49,24 +32,11 @@ export function DashboardMapPreview({ mapMarkers }: DashboardMapPreviewProps) {
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         <div className="h-80 overflow-hidden rounded-md border">
-          <Map center={center} zoom={13}>
-            {mapMarkers.markers.map((marker) => (
-              <MapMarker
-                key={marker.id}
-                longitude={marker.longitude}
-                latitude={marker.latitude}
-              >
-                <MarkerContent>
-                  <div className="rounded-full border-2 border-white/95 shadow-md">
-                    <div
-                      className={`size-3 rounded-full ${severityClass(marker.severity)}`}
-                    />
-                  </div>
-                </MarkerContent>
-              </MapMarker>
-            ))}
-            <MapControls />
-          </Map>
+          <IncidentMapSceneShell
+            embedded
+            markers={mapMarkers.markers}
+            destination={mapMarkers.destination}
+          />
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline">
