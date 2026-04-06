@@ -172,6 +172,46 @@ export const messageCatalog: MessageCatalog = {
     fil: 'Nagkaroon ng error habang ipinapasa ang ulat mo. Subukan muli.',
     hil: 'May nagluntad nga error samtang ginapadala ang imo report. Palihog liwat.',
   },
+  'incident.status.title': {
+    eng: 'Your Recent Report Statuses',
+    fil: 'Mga Status ng Iyong Huling Ulat',
+    hil: 'Mga Status sang Imo Bag-o nga Report',
+  },
+  'incident.status.empty': {
+    eng: 'You do not have incident reports yet. Send "report" or "quick report" to submit one.',
+    fil: 'Wala ka pang incident report. Ipadala ang "report" o "quick report" para mag-submit.',
+    hil: 'Wala ka pa sang incident report. Ipadala ang "report" ukon "quick report" para magsubmit.',
+  },
+  'incident.status.updated_prefix': {
+    eng: 'Updated',
+    fil: 'Na-update',
+    hil: 'Na-update',
+  },
+  'incident.status.new': {
+    eng: 'New',
+    fil: 'Bago',
+    hil: 'Bag-o',
+  },
+  'incident.status.validated': {
+    eng: 'Validated',
+    fil: 'Na-validate',
+    hil: 'Na-validate',
+  },
+  'incident.status.in_progress': {
+    eng: 'In Progress',
+    fil: 'Isinasagawa',
+    hil: 'Ginatrabaho',
+  },
+  'incident.status.resolved': {
+    eng: 'Resolved',
+    fil: 'Naresolba',
+    hil: 'Nasolbar',
+  },
+  'incident.status.dismissed': {
+    eng: 'Dismissed',
+    fil: 'Tinanggihan',
+    hil: 'Gindismiss',
+  },
 
   // Freeform incident flow
   'incident.freeform.prompt': {
@@ -188,6 +228,11 @@ export const messageCatalog: MessageCatalog = {
     eng: 'Please share the location of the incident.',
     fil: 'Sabihin kung saan nangyari ang insidente.',
     hil: 'Palihog ihatag ang lokasyon sang insidente.',
+  },
+  'incident.freeform.review.report_label': {
+    eng: 'Report Details',
+    fil: 'Mga Detalye ng Ulat',
+    hil: 'Mga Detalye sang Report',
   },
   'incident.freeform.submitted.title': {
     eng: 'Report Submitted',
@@ -262,6 +307,51 @@ export const messageCatalog: MessageCatalog = {
     eng: 'Send "{{commands}}" to begin.',
     fil: 'Ipadala ang "{{commands}}" para magsimula.',
     hil: 'Ipadala ang "{{commands}}" para magsugod.',
+  },
+  'handler.start.hint_intro': {
+    eng: 'What would you like to do?',
+    fil: 'Ano ang gusto mong gawin?',
+    hil: 'Ano ang gusto mo himuon?',
+  },
+  'handler.start.hint_guided_report': {
+    eng: '1) Send "{{command}}" for a step-by-step incident report.',
+    fil: '1) Ipadala ang "{{command}}" para sa step-by-step na pag-ulat ng insidente.',
+    hil: '1) Ipadala ang "{{command}}" para sa tinun-an nga pagreport sang insidente.',
+  },
+  'handler.start.hint_quick_report': {
+    eng: '2) Send "{{command}}" for a one-message quick report.',
+    fil: '2) Ipadala ang "{{command}}" para sa mabilis na isang mensaheng report.',
+    hil: '2) Ipadala ang "{{command}}" para sa madasig nga isa ka mensaheng report .',
+  },
+  'handler.start.hint_profile': {
+    eng: '3) Send "{{command}}" to update your profile settings.',
+    fil: '3) Ipadala ang "{{command}}" para i-update ang profile settings mo.',
+    hil: '3) Ipadala ang "{{command}}" para i-update ang profile settings mo.',
+  },
+  'handler.start.option_guided_report_desc': {
+    eng: 'Step-by-step incident report.',
+    fil: 'Step-by-step na pag-ulat ng insidente.',
+    hil: 'Step-by-step nga pagreport sang insidente.',
+  },
+  'handler.start.option_quick_report_desc': {
+    eng: 'One-message quick report with AI assistance.',
+    fil: 'Mabilis na one-message report na may AI assistance.',
+    hil: 'Madasig nga one-message report nga may AI assistance.',
+  },
+  'handler.start.option_profile_desc': {
+    eng: 'Update your profile details.',
+    fil: 'I-update ang profile details mo.',
+    hil: 'I-update ang profile details mo.',
+  },
+  'handler.start.option_status_desc': {
+    eng: 'Check the latest status of your reports.',
+    fil: 'Tingnan ang pinakabagong status ng mga ulat mo.',
+    hil: 'Susiha ang pinakabag-o nga status sang imo mga report.',
+  },
+  'handler.start.hint_tip': {
+    eng: 'Tip: You can also type naturally, like "I want to report an incident."',
+    fil: 'Tip: Puwede ka ring magsulat nang natural, gaya ng "Gusto kong mag-report ng insidente."',
+    hil: 'Tip: Pwede ka man magsulat sang natural, pareho sang "Gusto ko magreport sang insidente."',
   },
   'handler.stop': {
     eng: 'Goodbye!',

@@ -5,7 +5,7 @@ export {
   LOCALE_LABELS,
   SUPPORTED_LOCALES,
 } from './config';
-export { localizeIncidentSeverity } from './incident';
+export { localizeIncidentSeverity, localizeIncidentStatus } from './incident';
 export { messageCatalog } from './locales';
 export { resolveResidentLocale } from './resolver';
 export { createTranslator, normalizeLocale, translate } from './translator';

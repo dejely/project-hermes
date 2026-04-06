@@ -127,7 +127,8 @@ export interface Step {
   onAfterParse?: (
     value: unknown,
     data: FlowData,
-    input: unknown
+    input: unknown,
+    thread?: BotThread
   ) => Promise<Partial<FlowData> | void>;
 }
 
