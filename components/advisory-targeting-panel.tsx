@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { AdvisoryComposeForm } from '@/components/advisory-compose-form';
 import {
@@ -10,6 +10,7 @@ import {
   MapPolygonDraw,
   MarkerContent,
   MarkerLabel,
+  type MapPolygonDrawProps,
   type MapPolygonFeature,
 } from '@/components/control-center/map/map';
 import { Card } from '@/components/ui/card';
@@ -29,6 +30,26 @@ function getPolygonCoordinates(
   }
 
   return ring as [number, number][];
+}
+
+function arePolygonCoordinatesEqual(
+  left: [number, number][] | null,
+  right: [number, number][] | null
+) {
+  if (left === right) return true;
+  if (!left || !right) return false;
+  if (left.length !== right.length) return false;
+
+  for (let index = 0; index < left.length; index += 1) {
+    if (
+      left[index][0] !== right[index][0] ||
+      left[index][1] !== right[index][1]
+    ) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function pointInPolygon(point: [number, number], polygon: [number, number][]) {
@@ -102,6 +123,54 @@ export function AdvisoryTargetingPanel({
     );
   }, [polygonCoordinates, residentsWithCoordinates]);
 
+  const selectedResidentIdsJson = useMemo(() => {
+    if (!polygonCoordinates) return '';
+    return JSON.stringify(Array.from(selectedResidentIds));
+  }, [polygonCoordinates, selectedResidentIds]);
+
+  const polygonModeOptions = useMemo<
+    NonNullable<MapPolygonDrawProps['polygonModeOptions']>
+  >(
+    () => ({
+      styles: {
+        fillColor: '#f59e0b',
+        fillOpacity: 0.25,
+        outlineColor: '#ea580c',
+        outlineOpacity: 0.95,
+        outlineWidth: 2,
+        closingPointColor: '#f59e0b',
+        closingPointWidth: 4,
+        closingPointOutlineColor: '#ea580c',
+        closingPointOutlineWidth: 2,
+      },
+    }),
+    []
+  );
+
+  const selectModeOptions = useMemo<
+    NonNullable<MapPolygonDrawProps['selectModeOptions']>
+  >(
+    () => ({
+      styles: {
+        selectedPolygonColor: '#f59e0b',
+        selectedPolygonFillOpacity: 0.3,
+        selectedPolygonOutlineColor: '#c2410c',
+        selectedPolygonOutlineWidth: 2,
+      },
+    }),
+    []
+  );
+
+  const handlePolygonChange = useCallback((features: MapPolygonFeature[]) => {
+    const nextPolygon = getPolygonCoordinates(features);
+
+    setPolygonCoordinates((currentPolygon) =>
+      arePolygonCoordinatesEqual(currentPolygon, nextPolygon)
+        ? currentPolygon
+        : nextPolygon
+    );
+  }, []);
+
   return (
     <div className="flex flex-col gap-6">
       <Card className="h-60 overflow-hidden p-0">
@@ -145,33 +214,19 @@ export function AdvisoryTargetingPanel({
             );
           })}
           <MapPolygonDraw
-            polygonModeOptions={{
-              styles: {
-                fillColor: '#f59e0b',
-                fillOpacity: 0.25,
-                outlineColor: '#ea580c',
-                outlineOpacity: 0.95,
-                outlineWidth: 2,
-                closingPointColor: '#f59e0b',
-                closingPointWidth: 4,
-                closingPointOutlineColor: '#ea580c',
-                closingPointOutlineWidth: 2,
-              },
-            }}
-            selectModeOptions={{
-              styles: {
-                selectedPolygonColor: '#f59e0b',
-                selectedPolygonFillOpacity: 0.3,
-                selectedPolygonOutlineColor: '#c2410c',
-                selectedPolygonOutlineWidth: 2,
-              },
-            }}
+            polygonModeOptions={polygonModeOptions}
+            selectModeOptions={selectModeOptions}
+            onChange={handlePolygonChange}
           />
           <MapControls showZoom showCompass />
         </Map>
       </Card>
 
-      <AdvisoryComposeForm templates={templates} targetPolygon={polygonJson} />
+      <AdvisoryComposeForm
+        templates={templates}
+        targetPolygon={polygonJson}
+        targetResidentIds={selectedResidentIdsJson}
+      />
     </div>
   );
 }

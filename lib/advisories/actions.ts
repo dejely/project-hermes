@@ -65,6 +65,29 @@ function parseTargetPolygon(
   }
 }
 
+function parseTargetResidentIds(
+  value: FormDataEntryValue | null
+): string[] | null {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    if (!Array.isArray(parsed)) {
+      return null;
+    }
+
+    const normalizedIds = parsed.filter(
+      (entry): entry is string => typeof entry === 'string' && entry.length > 0
+    );
+
+    return normalizedIds;
+  } catch {
+    return null;
+  }
+}
+
 function pointInPolygon(point: [number, number], polygon: [number, number][]) {
   const [x, y] = point;
   let inside = false;
@@ -190,6 +213,9 @@ export async function createAdvisoryAction(
   try {
     const supabase = await createClient();
     const targetPolygon = parseTargetPolygon(formData.get('targetPolygon'));
+    const targetResidentIds = parseTargetResidentIds(
+      formData.get('targetResidentIds')
+    );
 
     if (normalizedIntent === 'save_template') {
       const templateNameValidation = advisoryTemplateNameSchema.safeParse(
@@ -264,7 +290,22 @@ export async function createAdvisoryAction(
 
     let residentTargets: ResidentTarget[] = [];
 
-    if (targetPolygon) {
+    if (targetResidentIds) {
+      if (targetResidentIds.length === 0) {
+        residentTargets = [];
+      } else {
+        const residentsResult = await adminClient
+          .from('residents')
+          .select('id, thread_id, platform')
+          .in('id', targetResidentIds);
+
+        if (residentsResult.error) {
+          throw residentsResult.error;
+        }
+
+        residentTargets = (residentsResult.data ?? []) as ResidentTarget[];
+      }
+    } else if (targetPolygon) {
       const residentsResult = await adminClient.rpc(
         'residents_within_polygon',
         {

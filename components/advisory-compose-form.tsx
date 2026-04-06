@@ -47,9 +47,11 @@ function fieldError(
 export function AdvisoryComposeForm({
   templates,
   targetPolygon,
+  targetResidentIds,
 }: {
   templates: AdvisoryTemplateItem[];
   targetPolygon?: string;
+  targetResidentIds?: string;
 }) {
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
   const [showAllTemplates, setShowAllTemplates] = useState(false);
@@ -165,6 +167,11 @@ export function AdvisoryComposeForm({
             type="hidden"
             name="targetPolygon"
             value={targetPolygon ?? ''}
+          />
+          <input
+            type="hidden"
+            name="targetResidentIds"
+            value={targetResidentIds ?? ''}
           />
 
           {templates.length > 0 ? (
