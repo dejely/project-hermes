@@ -191,7 +191,7 @@ export function ChatBox({
                 <div
                   key={message.id}
                   className={`flex ${
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
+                    message.role === 'user' ? 'justify-start' : 'justify-end'
                   }`}
                 >
                   <Card
